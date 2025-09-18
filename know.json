@@ -28,7 +28,16 @@
               "type": "string",
               "example": "incident"
             }
-          }
+          },
+          {
+        "name": "sysparm_query",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "description": "An encoded query string used to filter the results. For example, `number=INC0010017` will search for an Incident by its Number field."
+      }
         ],
         "responses": {
           "200": {
@@ -365,7 +374,121 @@
         }
       }
       
+    },
+    "/api/now/table/sys_user": {
+      "get": {
+        "summary": "Get user records",
+        "operationId":"getUsers",
+        "description": "Retrieve a list of users from the sys_user table",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              },
+              "application/xml": {},
+              "text/xml": {}
+            }
+          }
+        }
+      }
+    },
+    "/api/now/table/sys_user/{sys_id}": {
+      "get": {
+        "summary": "Get a single user record",
+        "operationId":"getSpecficUser",
+        "description": "Retrieve details of a specific user by sys_id",
+        "parameters": [
+          {
+            "name": "sys_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The sys_id of the user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "object"
+                    }
+                  }
+                }
+              },
+              "application/xml": {},
+              "text/xml": {}
+            }
+          }
+        }
+      }
+    },
+    "/api/now/ui/user/current_user": {
+      "get": {
+        "summary": "Get current user",
+        "operationId":"getCurrentUser",
+        "description": "Retrieve details of the currently logged-in user",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "properties": {
+                        "sys_id": { "type": "string" },
+                        "user_name": { "type": "string" },
+                        "first_name": { "type": "string" },
+                        "last_name": { "type": "string" },
+                        "email": { "type": "string" },
+                        "roles": { "type": "string" },
+                        "active": { "type": "boolean" }
+                      },
+                      "example": {
+                        "sys_id": "46d44a56db701010a9ad6d8a48961986",
+                        "user_name": "jdoe",
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "email": "jdoe@example.com",
+                        "roles": "admin, itil, catalog_admin",
+                        "active": true
+                      }
+                    }
+                  }
+                }
+              },
+              "application/xml": {},
+              "text/xml": {}
+            }
+          }
+        }
+      }
     }
+
+
+   
+
   },
   "components": {
     "schemas": {
@@ -677,6 +800,7 @@
           }
         }
       }
+      
     }
   }
 }
