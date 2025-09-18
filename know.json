@@ -1,0 +1,682 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Table API",
+    "description": "Allows you to perform create, read, update and delete (CRUD) operations on existing tables. This specification includes a detailed schema for the 'incident' table as an example.",
+    "version": "latest"
+  },
+  "externalDocs": {
+    "url": "https://docs.servicenow.com/?context=CSHelp:REST-Table-API"
+  },
+  "servers": [
+    {
+      "url": "https://dev202281.service-now.com/"
+    }
+  ],
+  "paths": {
+    
+    "/api/now/table/{tableName}": {
+      "get": {
+        "description": "Retrieve records from a table. The response schema will vary based on the tableName.",
+        "operationId":"getTableData",
+        "parameters": [
+          {
+            "name": "tableName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "incident"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK. The example below shows a response from the 'incident' table.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableApiListResponse"
+                },
+                "example": {
+                  "result": [
+                    {
+                      "sys_id": "5a99085d8388b210fd669defeeaad3e0",
+                      "number": "INC0010017",
+                      "state": "1",
+                      "short_description": "Network printer is down",
+                      "caller_id": "6816f79cc0a8016401c5a33be04be441",
+                      "assignment_group": "d625dccec0a8016700a222a0f7900d06"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Create a record in a table. The required fields in the body depend on the table's business rules.",
+        "operationId":"createIncidentTableRecord",
+        "parameters": [
+          {
+            "name": "tableName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "incident"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The record to create. The example below is for creating an incident.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+               "$ref": "#/components/schemas/IncidentRecord" 
+                        
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableApiSingleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+      
+    },
+    "/api/now/table/kb_knowledge": {
+     
+      "post": {
+        "description": "Create a record in a table. The required fields in the body depend on the table's business rules.",
+        "operationId":"createKnowledgeTableRecord",
+        "requestBody": {
+          "description": "The record to create. The example below is for creating an incident.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+               "$ref": "#/components/schemas/KnowledgeRecord" 
+                        
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableApiSingleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/now/table/{tableName}/{sys_id}": {
+      "get": {
+        "description": "Retrieve a single record from a table.",
+        "operationId":"retrieveTableDataBasedOnSysId",
+        "parameters": [
+          {
+            "name": "tableName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "incident"
+            }
+          },
+          {
+            "name": "sys_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableApiSingleResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Update a record with a full replacement.",
+        "operationId":"updateIncidentTableMoreAttributes",
+        "parameters": [
+          {
+            "name": "tableName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "incident"
+            }
+          },
+          {
+            "name": "sys_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IncidentRecord"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableApiSingleResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "Update a record with a partial modification.",
+        "operationId":"updateIncidentTableLessAttributes",
+        "parameters": [
+          {
+            "name": "tableName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "incident"
+            }
+          },
+          {
+            "name": "sys_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IncidentRecord"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableApiSingleResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete a record.",
+        "operationId":"deleteRecordFromTable",
+        "parameters": [
+          {
+            "name": "tableName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "incident"
+            }
+          },
+          {
+            "name": "sys_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/api/now/table/kb_knowledge/{sys_id}": {
+      
+      "put": {
+        "description": "Update a record with a full replacement.",
+        "operationId":"updateKnowledgeTableMoreAttributes",
+        "parameters": [
+          
+          {
+            "name": "sys_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IncidentRecord"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableApiSingleResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "Update a record with a partial modification.",
+        "operationId":"updateKnowledgeTableLessAttributes",
+        "parameters": [
+          
+          {
+            "name": "sys_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IncidentRecord"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableApiSingleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+      
+    }
+  },
+  "components": {
+    "schemas": {
+      "IncidentRecord": {
+        "type": "object",
+        "description": "Schema definition for a record in the 'incident' table.",
+        "properties": {
+          "active": { "type": "boolean" },
+          "activity_due": { "type": "string", "format": "date-time" },
+          "additional_assignee_list": { "type": "string" },
+          "approval": { "type": "string" },
+          "assigned_to": { "type": "string", "description": "sys_id of the user" },
+          "assignment_group": { "type": "string", "description": "sys_id of the group" },
+          "business_duration": { "type": "string" },
+          "caller_id": { "type": "string", "description": "sys_id of the user" },
+          "category": { "type": "string" },
+          "close_code": { "type": "string" },
+          "close_notes": { "type": "string" },
+          "closed_at": { "type": "string", "format": "date-time", "readOnly": true },
+          "closed_by": { "type": "string", "readOnly": true },
+          "cmdb_ci": { "type": "string", "description": "sys_id of the configuration item" },
+          "comments": { "type": "string" },
+          "comments_and_work_notes": { "type": "string" },
+          "company": { "type": "string", "description": "sys_id of the company" },
+          "contact_type": { "type": "string" },
+          "description": { "type": "string" },
+          "due_date": { "type": "string", "format": "date-time" },
+          "escalation": { "type": "integer" },
+          "expected_start": { "type": "string", "format": "date-time" },
+          "impact": { "type": "integer" },
+          "incident_state": { "type": "integer" },
+          "knowledge": { "type": "boolean" },
+          "location": { "type": "string", "description": "sys_id of the location" },
+          "made_sla": { "type": "boolean" },
+          "notify": { "type": "integer" },
+          "number": { "type": "string", "readOnly": true },
+          "opened_at": { "type": "string", "format": "date-time", "readOnly": true },
+          "opened_by": { "type": "string", "readOnly": true },
+          "parent_incident": { "type": "string" },
+          "priority": { "type": "integer" },
+          "problem_id": { "type": "string" },
+          "reassignment_count": { "type": "integer", "readOnly": true },
+          "resolved_at": { "type": "string", "format": "date-time", "readOnly": true },
+          "resolved_by": { "type": "string", "readOnly": true },
+          "rfc": { "type": "string" },
+          "severity": { "type": "integer" },
+          "short_description": { "type": "string" },
+          "sla_due": { "type": "string", "format": "date-time" },
+          "state": {
+            "type": "string",
+            "description": "The display value of the record's current state.",
+            "enum": [
+              "New",
+              "In Progress",
+              "On Hold",
+              "Resolved",
+              "Closed",
+              "Cancelled"
+            ]
+          },
+          "hold_reason": {
+              "type": 
+                "string"
+              ,
+              "description": "The reason a record is on hold. This is typically set only when the state is 'On Hold'.",
+              "enum": [
+
+                "Awaiting Caller",
+                "Awaiting Change",
+                "Awaiting Problem",
+                "Awaiting Vendor"
+              ]
+          },
+          "subcategory": { "type": "string" },
+          "sys_class_name": { "type": "string" },
+          "sys_created_by": { "type": "string", "readOnly": true },
+          "sys_created_on": { "type": "string", "format": "date-time", "readOnly": true },
+          "sys_domain": { "type": "string" },
+          "sys_id": { "type": "string", "format": "uuid", "readOnly": true },
+          "sys_mod_count": { "type": "integer", "readOnly": true },
+          "sys_updated_by": { "type": "string", "readOnly": true },
+          "sys_updated_on": { "type": "string", "format": "date-time", "readOnly": true },
+          "urgency": { "type": "integer" },
+          "work_notes": { "type": "string" }
+        },
+        "example": {
+          "caller_id": "6816f79cc0a8016401c5a33be04be441",
+          "short_description": "Email server is slow",
+          "category": "software",
+          "impact": 2,
+          "urgency": 2
+        }
+      },
+      "KnowledgeRecord": {
+    "type": "object",
+    "description": "Schema definition for a record in the 'kb_knowledge' table.",
+    "properties": {
+      "active": { "type": "boolean" },
+      "article_type": { "type": "string", "enum": ["text", "wiki", "html"] },
+      "author": { "type": "string", "description": "sys_id of the authoring user" },
+      "disable_commenting": { "type": "boolean" },
+      "disable_suggesting": { "type": "boolean" },
+      "display_attachments": { "type": "boolean" },
+      "flagged": { "type": "boolean" },
+      "kb_category": { "type": "string", "description": "sys_id of the knowledge category" },
+      "kb_knowledge_base": { "type": "string", "description": "sys_id of the knowledge base" },
+      "meta": { "type": "string" },
+      "meta_description": { "type": "string" },
+      "ownership_group": { "type": "string", "description": "sys_id of the ownership group" },
+      "published": { "type": "string", "format": "date-time", "readOnly": true },
+      "rating": { "type": "number", "readOnly": true },
+      "roles": { "type": "string", "description": "Comma-separated list of roles that can view" },
+      "scheduled_publish_date": { "type": "string", "format": "date-time" },
+      "short_description": { "type": "string" },
+      "text": { "type": "string", "description": "The main body of the article (HTML content)" },
+      "valid_to": { "type": "string", "format": "date" },
+      "workflow_state": {
+          "type": "string",
+          "description": "The current lifecycle state of the knowledge article.",
+          "readOnly": true,
+          "enum": [
+            "draft",
+            "review",
+            "published",
+            "pending_retirement",
+            "retired",
+            "outdated"
+          ]
+        },
+      "number": { "type": "string", "readOnly": true },
+      "sys_id": { "type": "string", "format": "uuid", "readOnly": true },
+      "sys_view_count": { "type": "integer", "readOnly": true }
+    },
+    "example":{
+  "short_description": "How to Connect to the Office VPN on Windows",
+  "kb_knowledge_base": "a73c11dcdb533300fb7656b6gf961922",
+  "kb_category": "b54f4695c611227a01b54122e8006d22",
+  "author": "6816f79cc0a8016401c5a33be04be441",
+  "article_type": "html",
+  "active": true,
+  "valid_to": "2027-12-31",
+  "text": "<h1>Connecting to the VPN</h1><p>Follow these steps to connect to the corporate Virtual Private Network (VPN) from your Windows device.</p><strong>Prerequisites:</strong><ul><li>You must have the GlobalProtect VPN client installed.</li><li>You must have your multi-factor authentication (MFA) device ready.</li></ul><p>Please contact the IT Help Desk if you need assistance with the client installation.</p>"
+}
+       }, 
+      "ServiceRequestRecord": {
+    "type": "object",
+    "description": "Schema definition for a record in the 'sc_request' (Service Request) table.",
+    "properties": {
+      "active": {
+        "type": "boolean"
+      },
+      "approval": {
+        "type": "string",
+        "enum": ["approved", "rejected", "requested"]
+      },
+      "assigned_to": {
+        "type": "string",
+        "description": "sys_id of the assigned user."
+      },
+      "assignment_group": {
+        "type": "string",
+        "description": "sys_id of the assignment group."
+      },
+      "close_notes": {
+        "type": "string"
+      },
+      "closed_at": {
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true
+      },
+      "comments": {
+        "type": "string"
+      },
+      "company": {
+        "type": "string",
+        "description": "sys_id of the company."
+      },
+      "description": {
+        "type": "string"
+      },
+      "due_date": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "escalation": {
+        "type": "integer"
+      },
+      "expected_start": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "impact": {
+        "type": "integer"
+      },
+      "knowledge": {
+        "type": "boolean"
+      },
+      "location": {
+        "type": "string",
+        "description": "sys_id of the location."
+      },
+      "made_sla": {
+        "type": "boolean"
+      },
+      "number": {
+        "type": "string",
+        "readOnly": true
+      },
+      "opened_at": {
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true
+      },
+      "opened_by": {
+        "type": "string",
+        "description": "sys_id of the user who opened the request.",
+        "readOnly": true
+      },
+      "price": {
+        "type": "number",
+        "format": "double"
+      },
+      "priority": {
+        "type": "integer"
+      },
+      "reassignment_count": {
+        "type": "integer",
+        "readOnly": true
+      },
+      "request_state": {
+        "type": "string"
+      },
+      "requested_for": {
+        "type": "string",
+        "description": "sys_id of the user the request is for."
+      },
+      "short_description": {
+        "type": "string"
+      },
+      "special_instructions": {
+        "type": "string"
+      },
+      "stage": {
+        "type": "string"
+      },
+      "state": {
+        "type": "integer"
+      },
+      "sys_created_on": {
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true
+      },
+      "sys_id": {
+        "type": "string",
+        "format": "uuid",
+        "readOnly": true
+      },
+      "sys_updated_on": {
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true
+      },
+      "urgency": {
+        "type": "integer"
+      },
+      "watch_list": {
+        "type": "string",
+        "description": "Comma-separated list of user sys_ids."
+      },
+      "work_notes": {
+        "type": "string"
+      }
+    },
+    "example": {
+      "requested_for": "6816f79cc0a8016401c5a33be04be441",
+      "short_description": "New Laptop Request for Alice Johnson",
+      "description": "Requesting a standard developer laptop (Model X-15) for a new hire, Alice Johnson.",
+      "urgency": 2,
+      "impact": 2,
+      "price": 1800.00
+    }
+      },
+      "TableApiSingleResponse": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "The resulting record. The specific fields depend on the table queried. The example shows an Incident record.",
+            "example": {
+              "sys_id": "5a99085d8388b210fd669defeeaad3e0",
+              "number": "INC0010017",
+              "short_description": "Email server is slow"
+            }
+          }
+        }
+      },
+      "TableApiListResponse": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        }
+      }
+    }
+  }
+}
