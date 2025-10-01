@@ -10,6 +10,174 @@
     }
   ],
   "paths": {
+   "/sites": {
+      "get": {
+        "summary": "List and search SharePoint sites",
+        "description": "Get all sites the signed-in user can access. Use search=* to get all sites or specify keywords. Use $select for performance optimization.",
+        "operationId": "sites_site_list_site",
+        "tags": ["Sites"],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Search query. Use '*' for all sites or specify keywords like 'ProjectX'",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "*",
+              "example": "*"
+            }
+          },
+          {
+            "name": "$select",
+            "in": "query",
+            "description": "Comma-separated list of properties to select for performance optimization",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "id,displayName,webUrl,createdDateTime"
+            }
+          },
+          {
+            "name": "$top",
+            "in": "query",
+            "description": "Number of results to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 999,
+              "default": 50,
+              "example": 5
+            }
+          },
+          {
+            "name": "$orderby",
+            "in": "query",
+            "description": "Sort order (e.g., 'displayName desc')",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "displayName desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SitesResponse"
+                },
+                "examples": {
+                  "allSites": {
+                    "summary": "Get all sites",
+                    "value": {
+                      "value": [
+                        {
+                          "displayName": "Project Alpha Team Site",
+                          "webUrl": "https://contoso.sharepoint.com/sites/ProjectAlpha",
+                          "createdDateTime": "2024-01-15T10:30:00Z",
+                          "lastModifiedDateTime": "2024-09-20T14:22:00Z",
+                          "description": "Main collaboration site for Project Alpha"
+                        },
+                        {
+                          "displayName": "HR Portal",
+                          "webUrl": "https://contoso.sharepoint.com/sites/HR",
+                          "createdDateTime": "2023-11-05T09:15:00Z",
+                          "lastModifiedDateTime": "2024-09-25T11:45:00Z",
+                          "description": "Human Resources information portal"
+                        }
+                      ],
+                      "@odata.nextLink": "https://graph.microsoft.com/v1.0/sites?search=*&$skiptoken=abc123"
+                    }
+                  },
+                  "searchByKeyword": {
+                    "summary": "Search sites by 'ProjectX'",
+                    "value": {
+                      "value": [
+                        {
+                          "displayName": "ProjectX Team Site",
+                          "webUrl": "https://contoso.sharepoint.com/sites/ProjectX",
+                          "createdDateTime": "2024-03-10T09:15:00Z"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "curl",
+            "source": "curl --location 'https://graph.microsoft.com/v1.0/sites?search=*' \\\n--header 'Authorization: Bearer YOUR_TOKEN'"
+          },
+          {
+            "lang": "curl",
+            "label": "Search by keyword",
+            "source": "curl --location 'https://graph.microsoft.com/v1.0/sites?search=ProjectX' \\\n--header 'Authorization: Bearer YOUR_TOKEN'"
+          },
+          {
+            "lang": "curl",
+            "label": "Optimized with $select",
+            "source": "curl --location 'https://graph.microsoft.com/v1.0/sites?search=*&$select=id,displayName,webUrl' \\\n--header 'Authorization: Bearer YOUR_TOKEN'"
+          }
+        ]
+      }
+    },
+    "/me": {
+      "get": {
+        "summary": "Get current user details",
+        "operationId": "get_user_details",
+        "description": "Retrieves the properties of the currently authenticated user.",
+        "responses": {
+          "200": {
+            "description": "Successful response with user details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "displayName": { "type": "string" },
+                    "givenName": { "type": "string" },
+                    "surname": { "type": "string" },
+                    "mail": { "type": "string" },
+                    "userPrincipalName": { "type": "string" },
+                    "jobTitle": { "type": "string" },
+                    "mobilePhone": { "type": "string" },
+                    "officeLocation": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/sites/{site-id}": {
       "get": {
         "summary": "Get site information",
