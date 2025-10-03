@@ -1,107 +1,159 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "ServiceNow Table API",
-    "description": "Allows you to perform create, read, update and delete (CRUD) operations on existing tables. This specification includes detailed schemas for 'incident', 'kb_knowledge', and other common tables.",
-    "version": "1.0.0",
-    "contact": {
-      "name": "ServiceNow API Support",
-      "url": "https://docs.servicenow.com"
-    }
+    "title": "Table API",
+    "description": "Allows you to perform create, read, update and delete (CRUD) operations on existing tables. This specification includes a detailed schema for the 'incident' table as an example.",
+    "version": "latest"
   },
   "externalDocs": {
-    "description": "Official ServiceNow Table API Documentation",
     "url": "https://docs.servicenow.com/?context=CSHelp:REST-Table-API"
   },
   "servers": [
     {
-      "url": "https://dev202281.service-now.com",
-      "description": "Development Instance"
-    }
-  ],
-  "security": [
-    {
-      "basicAuth": []
-    },
-    {
-      "oauth2": []
-    }
-  ],
-  "tags": [
-    {
-      "name": "Incidents",
-      "description": "Operations on incident records"
-    },
-    {
-      "name": "Knowledge Base",
-      "description": "Operations on knowledge articles"
-    },
-    {
-      "name": "Service Requests",
-      "description": "Operations on service request records"
-    },
-    {
-      "name": "Users",
-      "description": "Operations on user records"
-    },
-    {
-      "name": "Generic Table Operations",
-      "description": "Generic CRUD operations on any table"
+      "url": "https://dev202281.service-now.com/"
     }
   ],
   "paths": {
+    
     "/api/now/table/{tableName}": {
       "get": {
-        "tags": ["Generic Table Operations"],
-        "summary": "Retrieve records from a table",
-        "description": "Retrieve records from any ServiceNow table. The response schema varies based on the tableName. Use sysparm_query to filter results using encoded query syntax.",
-        "operationId": "getTableRecords",
+        "description": "Retrieve records from a table. The response schema will vary based on the tableName.",
+        "operationId":"getTableData",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tableNameParam"
+            "name": "tableName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "incident"
+            }
           },
           {
-            "$ref": "#/components/parameters/sysparmQuery"
+        "name": "sysparm_query",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "description": "An encoded query string used to filter the results. For example, `number=INC0010017` will search for an Incident by its Number field."
+      },{
+            "name": "sysparm_display_value",
+            "in": "query",
+            "description": "Return field display values (true), actual values (false), or both (all) (default: false)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false",
+                "all"
+              ],
+              "default": "false"
+            }
           },
           {
-            "$ref": "#/components/parameters/sysparmDisplayValue"
+            "name": "sysparm_exclude_reference_link",
+            "in": "query",
+            "description": "True to exclude Table API links for reference fields (default: false)",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
           },
           {
-            "$ref": "#/components/parameters/sysparmExcludeReferenceLink"
+            "name": "sysparm_suppress_pagination_header",
+            "in": "query",
+            "description": "True to supress pagination header (default: false)",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
           },
           {
-            "$ref": "#/components/parameters/sysparmFields"
+            "name": "sysparm_fields",
+            "in": "query",
+            "description": "A comma-separated list of fields to return in the response",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "name": "sysparm_limit",
             "in": "query",
             "description": "The maximum number of results returned per page (default: 10,000)",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "integer",
-              "default": 1000
+              "default": 10000
+            }
+          },
+          {
+            "name": "sysparm_view",
+            "in": "query",
+            "description": "Render the response according to the specified UI view (overridden by sysparm_fields)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sysparm_query_category",
+            "in": "query",
+            "description": "Name of the query category (read replica category) to use for queries",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sysparm_query_no_domain",
+            "in": "query",
+            "description": "True to access data across domains if authorized (default: false)",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "sysparm_no_count",
+            "in": "query",
+            "description": "Do not execute a select count(*) on table (default: false)",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+                  {
+            "name": "sysparm_offset",
+            "in": "query",
+            "description": "The starting row for the current page (pagination)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "example": 0
             }
           },
           {
             "name": "sysparm_first_row",
             "in": "query",
             "description": "The starting row (offset) for results, for pagination (default: 0)",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "integer",
-              "default": 1
+              "default": 0
             }
-          },
-          {
-            "$ref": "#/components/parameters/sysparmOffset"
-          },
-          {
-            "$ref": "#/components/parameters/sysparmNoCount"
           }
         ],
         "responses": {
           "200": {
-            "description": "Successfully retrieved records",
+            "description": "OK. The example below shows a response from the 'incident' table.",
             "content": {
               "application/json": {
                 "schema": {
@@ -113,59 +165,46 @@
                       "sys_id": "5a99085d8388b210fd669defeeaad3e0",
                       "number": "INC0010017",
                       "state": "1",
-                      "short_description": "Network printer is down"
+                      "short_description": "Network printer is down",
+                      "caller_id": "6816f79cc0a8016401c5a33be04be441",
+                      "assignment_group": "d625dccec0a8016700a222a0f7900d06"
                     }
                   ]
                 }
               }
             }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
           }
         }
       },
       "post": {
-        "tags": ["Generic Table Operations"],
-        "summary": "Create a record in a table",
-        "description": "Create a new record in the specified table. Required fields depend on the table's business rules. The 'number' field is auto-generated and should NOT be included in the request.",
-        "operationId": "createTableRecord",
+        "description": "Create a record in a table. The required fields in the body depend on the table's business rules.",
+        "operationId":"createIncidentTableRecord",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tableNameParam"
+            "name": "tableName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "incident"
+            }
           }
         ],
         "requestBody": {
-          "description": "The record to create. Fields depend on the target table.",
+          "description": "The record to create. The example below is for creating an incident.",
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "additionalProperties": true
-              },
-              "example": {
-                "short_description": "Email server is slow",
-                "caller_id": "6816f79cc0a8016401c5a33be04be441",
-                "category": "software",
-                "impact": 2,
-                "urgency": 2
+               "$ref": "#/components/schemas/IncidentRecord" 
+                        
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "Record created successfully",
+            "description": "Created",
             "content": {
               "application/json": {
                 "schema": {
@@ -173,42 +212,69 @@
                 }
               }
             }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+      
+    },
+    "/api/now/table/kb_knowledge": {
+     
+      "post": {
+        "description": "Create a record in a table. The required fields in the body depend on the table's business rules.",
+        "operationId":"createKnowledgeTableRecord",
+        "requestBody": {
+          "description": "The record to create. The example below is for creating an incident.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+               "$ref": "#/components/schemas/KnowledgeRecord" 
+                        
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableApiSingleResponse"
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/now/table/{tableName}/{sys_id}": {
       "get": {
-        "tags": ["Generic Table Operations"],
-        "summary": "Retrieve a single record",
-        "description": "Retrieve a specific record from a table using its sys_id",
-        "operationId": "getTableRecordById",
+        "description": "Retrieve a single record from a table.",
+        "operationId":"retrieveTableDataBasedOnSysId",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tableNameParam"
+            "name": "tableName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "incident"
+            }
           },
           {
-            "$ref": "#/components/parameters/sysIdParam"
-          },
-          {
-            "$ref": "#/components/parameters/sysparmDisplayValue"
-          },
-          {
-            "$ref": "#/components/parameters/sysparmFields"
+            "name": "sys_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "Successfully retrieved record",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -216,26 +282,30 @@
                 }
               }
             }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
           }
         }
       },
       "put": {
-        "tags": ["Generic Table Operations"],
-        "summary": "Update a record (full replacement)",
-        "description": "Performs a full update of the record. All fields not included in the request body will be cleared/reset to default values. Note: The 'number' and 'sys_id' fields are system-generated and read-only. Including them in the request body will have no effect.",
-        "operationId": "updateTableRecordFull",
+        "description": "Update a record with a full replacement.",
+        "operationId":"updateIncidentTableMoreAttributes",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tableNameParam"
+            "name": "tableName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "incident"
+            }
           },
           {
-            "$ref": "#/components/parameters/sysIdParam"
+            "name": "sys_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "requestBody": {
@@ -243,19 +313,14 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "additionalProperties": true
-              },
-              "example": {
-                "short_description": "Updated description",
-                "state": 2
+                "$ref": "#/components/schemas/IncidentRecord"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Record updated successfully",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -263,29 +328,30 @@
                 }
               }
             }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
           }
         }
       },
       "patch": {
-        "tags": ["Generic Table Operations"],
-        "summary": "Update a record (partial modification)",
-        "description": "Performs a partial update of the record. Only fields included in the request body will be modified. Other fields remain unchanged. Note: The 'number' and 'sys_id' fields are system-generated and read-only. Including them in the request body will have no effect.",
-        "operationId": "updateTableRecordPartial",
+        "description": "Update a record with a partial modification.",
+        "operationId":"updateIncidentTableLessAttributes",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tableNameParam"
+            "name": "tableName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "incident"
+            }
           },
           {
-            "$ref": "#/components/parameters/sysIdParam"
+            "name": "sys_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "requestBody": {
@@ -293,19 +359,14 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "additionalProperties": true
-              },
-              "example": {
-                "state": 3,
-                "work_notes": "Awaiting vendor response"
+                "$ref": "#/components/schemas/IncidentRecord"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Record updated successfully",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
@@ -313,210 +374,54 @@
                 }
               }
             }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
           }
         }
       },
       "delete": {
-        "tags": ["Generic Table Operations"],
-        "summary": "Delete a record",
-        "description": "Delete a specific record from the table",
-        "operationId": "deleteTableRecord",
+        "description": "Delete a record.",
+        "operationId":"deleteRecordFromTable",
         "parameters": [
           {
-            "$ref": "#/components/parameters/tableNameParam"
+            "name": "tableName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "incident"
+            }
           },
           {
-            "$ref": "#/components/parameters/sysIdParam"
+            "name": "sys_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "responses": {
           "204": {
-            "description": "Record deleted successfully"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        }
-      }
-    },
-    "/api/now/table/incident": {
-      "post": {
-        "tags": ["Incidents"],
-        "summary": "Create an incident",
-        "description": "Create a new incident record. The 'number' field is auto-generated by ServiceNow. Required fields typically include: caller_id, short_description",
-        "operationId": "createIncident",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/IncidentCreateRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Incident created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/IncidentResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          }
-        }
-      }
-    },
-    "/api/now/table/incident/{sys_id}": {
-      "put": {
-        "tags": ["Incidents"],
-        "summary": "Update an incident (full)",
-        "description": "Full update of an incident. The 'number' field is read-only and auto-generated. The 'sys_id' in the path identifies the record to update.",
-        "operationId": "updateIncidentFull",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/sysIdParam"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/IncidentUpdateRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Incident updated successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/IncidentResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        }
-      },
-      "patch": {
-        "tags": ["Incidents"],
-        "summary": "Update an incident (partial)",
-        "description": "Partial update of an incident. Only specified fields are modified. The 'number' field cannot be modified as it's system-generated.",
-        "operationId": "updateIncidentPartial",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/sysIdParam"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/IncidentUpdateRequest"
-              },
-              "example": {
-                "state": 2,
-                "assigned_to": "5137153cc611227c000bbd1bd8cd2005",
-                "work_notes": "Started investigation"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Incident updated successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/IncidentResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
-          }
-        }
-      }
-    },
-    "/api/now/table/kb_knowledge": {
-      "post": {
-        "tags": ["Knowledge Base"],
-        "summary": "Create a knowledge article",
-        "description": "Create a new knowledge base article. The 'number' field is auto-generated. Required fields typically include: short_description, kb_knowledge_base, text",
-        "operationId": "createKnowledgeArticle",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/KnowledgeCreateRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Knowledge article created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/KnowledgeResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
+            "description": "No Content"
           }
         }
       }
     },
     "/api/now/table/kb_knowledge/{sys_id}": {
+      
       "put": {
-        "tags": ["Knowledge Base"],
-        "summary": "Update a knowledge article (full)",
-        "description": "Full update of a knowledge article. The 'number' and 'sys_id' are read-only. Workflow state transitions may be restricted based on permissions.",
-        "operationId": "updateKnowledgeArticleFull",
+        "description": "Update a record with a full replacement.",
+        "operationId":"updateKnowledgeTableMoreAttributes",
         "parameters": [
+          
           {
-            "$ref": "#/components/parameters/sysIdParam"
+            "name": "sys_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "requestBody": {
@@ -524,38 +429,37 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/KnowledgeUpdateRequest"
+                "$ref": "#/components/schemas/IncidentRecord"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Knowledge article updated successfully",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/KnowledgeResponse"
+                  "$ref": "#/components/schemas/TableApiSingleResponse"
                 }
               }
             }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
           }
         }
       },
       "patch": {
-        "tags": ["Knowledge Base"],
-        "summary": "Update a knowledge article (partial)",
-        "description": "Partial update of a knowledge article. Only specified fields are modified.",
-        "operationId": "updateKnowledgeArticlePartial",
+        "description": "Update a record with a partial modification.",
+        "operationId":"updateKnowledgeTableLessAttributes",
         "parameters": [
+          
           {
-            "$ref": "#/components/parameters/sysIdParam"
+            "name": "sys_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "requestBody": {
@@ -563,55 +467,34 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/KnowledgeUpdateRequest"
-              },
-              "example": {
-                "text": "<h1>Updated Content</h1><p>New information added.</p>",
-                "valid_to": "2028-12-31"
+                "$ref": "#/components/schemas/IncidentRecord"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Knowledge article updated successfully",
+            "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/KnowledgeResponse"
+                  "$ref": "#/components/schemas/TableApiSingleResponse"
                 }
               }
             }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
           }
         }
       }
+      
     },
     "/api/now/table/sys_user": {
       "get": {
-        "tags": ["Users"],
         "summary": "Get user records",
+        "operationId":"getUsers",
         "description": "Retrieve a list of users from the sys_user table",
-        "operationId": "getUsers",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/sysparmQuery"
-          },
-          {
-            "$ref": "#/components/parameters/sysparmLimit"
-          },
-          {
-            "$ref": "#/components/parameters/sysparmFields"
-          }
-        ],
         "responses": {
           "200": {
-            "description": "Successfully retrieved users",
+            "description": "ok",
             "content": {
               "application/json": {
                 "schema": {
@@ -620,708 +503,379 @@
                     "result": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/UserRecord"
+                        "type": "object"
                       }
                     }
                   }
                 }
-              }
+              },
+              "application/xml": {},
+              "text/xml": {}
             }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
           }
         }
       }
     },
     "/api/now/table/sys_user/{sys_id}": {
       "get": {
-        "tags": ["Users"],
-        "summary": "Get a specific user",
+        "summary": "Get a single user record",
+        "operationId":"getSpecficUser",
         "description": "Retrieve details of a specific user by sys_id",
-        "operationId": "getUserById",
         "parameters": [
           {
-            "$ref": "#/components/parameters/sysIdParam"
+            "name": "sys_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The sys_id of the user"
           }
         ],
         "responses": {
           "200": {
-            "description": "Successfully retrieved user",
+            "description": "ok",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "result": {
-                      "$ref": "#/components/schemas/UserRecord"
+                      "type": "object"
                     }
                   }
                 }
-              }
+              },
+              "application/xml": {},
+              "text/xml": {}
             }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
           }
         }
       }
     },
     "/api/now/ui/user/current_user": {
       "get": {
-        "tags": ["Users"],
-        "summary": "Get current authenticated user",
-        "description": "Retrieve details of the currently authenticated user",
-        "operationId": "getCurrentUser",
+        "summary": "Get current user",
+        "operationId":"getCurrentUser",
+        "description": "Retrieve details of the currently logged-in user",
         "responses": {
           "200": {
-            "description": "Successfully retrieved current user",
+            "description": "ok",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
                     "result": {
-                      "$ref": "#/components/schemas/CurrentUserRecord"
+                      "type": "object",
+                      "properties": {
+                        "sys_id": { "type": "string" },
+                        "user_name": { "type": "string" },
+                        "first_name": { "type": "string" },
+                        "last_name": { "type": "string" },
+                        "email": { "type": "string" },
+                        "roles": { "type": "string" },
+                        "active": { "type": "boolean" }
+                      },
+                      "example": {
+                        "sys_id": "46d44a56db701010a9ad6d8a48961986",
+                        "user_name": "jdoe",
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "email": "jdoe@example.com",
+                        "roles": "admin, itil, catalog_admin",
+                        "active": true
+                      }
                     }
                   }
-                },
-                "example": {
-                  "result": {
-                    "sys_id": "46d44a56db701010a9ad6d8a48961986",
-                    "user_name": "jdoe",
-                    "first_name": "John",
-                    "last_name": "Doe",
-                    "email": "jdoe@example.com",
-                    "roles": "admin,itil,catalog_admin",
-                    "active": true
-                  }
                 }
-              }
+              },
+              "application/xml": {},
+              "text/xml": {}
             }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
           }
         }
       }
     }
+
+
+   
+
   },
   "components": {
-    "securitySchemes": {
-      "basicAuth": {
-        "type": "http",
-        "scheme": "basic",
-        "description": "HTTP Basic Authentication using username and password"
-      },
-      "oauth2": {
-        "type": "oauth2",
-        "flows": {
-          "authorizationCode": {
-            "authorizationUrl": "https://dev202281.service-now.com/oauth_auth.do",
-            "tokenUrl": "https://dev202281.service-now.com/oauth_token.do",
-            "scopes": {
-              "useraccount": "Access user account information"
-            }
-          }
-        }
-      }
-    },
-    "parameters": {
-      "tableNameParam": {
-        "name": "tableName",
-        "in": "path",
-        "required": true,
-        "description": "The name of the ServiceNow table (e.g., 'incident', 'kb_knowledge', 'sys_user')",
-        "schema": {
-          "type": "string",
-          "example": "incident"
-        }
-      },
-      "sysIdParam": {
-        "name": "sys_id",
-        "in": "path",
-        "required": true,
-        "description": "The unique system identifier (sys_id) of the record",
-        "schema": {
-          "type": "string",
-          "format": "uuid",
-          "example": "5a99085d8388b210fd669defeeaad3e0"
-        }
-      },
-      "sysparmQuery": {
-        "name": "sysparm_query",
-        "in": "query",
-        "required": false,
-        "description": "Encoded query string to filter results. Examples: number=INC0010017 (Find by number), state=1 (Find by state), active=true^caller_id=<sys_id> (Multiple conditions with AND), state=1^ORstate=2 (OR conditions)",
-        "schema": {
-          "type": "string"
-        },
-        "example": "state=1^active=true"
-      },
-      "sysparmDisplayValue": {
-        "name": "sysparm_display_value",
-        "in": "query",
-        "description": "Controls how reference fields are returned: false (default): Return sys_id values, true: Return display values, all: Return both sys_id and display values",
-        "required": false,
-        "schema": {
-          "type": "string",
-          "enum": ["true", "false", "all"],
-          "default": "false"
-        }
-      },
-      "sysparmExcludeReferenceLink": {
-        "name": "sysparm_exclude_reference_link",
-        "in": "query",
-        "description": "Set to true to exclude Table API links for reference fields",
-        "required": false,
-        "schema": {
-          "type": "boolean",
-          "default": false
-        }
-      },
-      "sysparmFields": {
-        "name": "sysparm_fields",
-        "in": "query",
-        "description": "Comma-separated list of fields to return (e.g., 'number,state,short_description')",
-        "required": false,
-        "schema": {
-          "type": "string"
-        },
-        "example": "number,state,short_description,caller_id"
-      },
-      "sysparmLimit": {
-        "name": "sysparm_limit",
-        "in": "query",
-        "description": "Maximum number of results to return per page",
-        "required": false,
-        "schema": {
-          "type": "integer",
-          "default": 10000,
-          "minimum": 1,
-          "maximum": 10000
-        }
-      },
-      "sysparmOffset": {
-        "name": "sysparm_offset",
-        "in": "query",
-        "description": "Starting record index for pagination (0-based)",
-        "required": false,
-        "schema": {
-          "type": "integer",
-          "default": 0,
-          "minimum": 0
-        }
-      },
-      "sysparmNoCount": {
-        "name": "sysparm_no_count",
-        "in": "query",
-        "description": "Set to true to skip the total count query for better performance",
-        "required": false,
-        "schema": {
-          "type": "boolean",
-          "default": false
-        }
-      }
-    },
     "schemas": {
-      "IncidentCreateRequest": {
-        "type": "object",
-        "required": ["caller_id", "short_description"],
-        "properties": {
-          "caller_id": {
-            "type": "string",
-            "description": "sys_id of the user reporting the incident (required)",
-            "example": "6816f79cc0a8016401c5a33be04be441"
-          },
-          "short_description": {
-            "type": "string",
-            "description": "Brief description of the incident (required)",
-            "example": "Email server is slow"
-          },
-          "description": {
-            "type": "string",
-            "description": "Detailed description of the incident"
-          },
-          "category": {
-            "type": "string",
-            "description": "Category of the incident",
-            "example": "software"
-          },
-          "subcategory": {
-            "type": "string",
-            "description": "Subcategory for more specific classification"
-          },
-          "impact": {
-            "type": "integer",
-            "description": "Impact level (1=High, 2=Medium, 3=Low)",
-            "enum": ["1", "2", "3"],
-            "example": 2
-          },
-          "urgency": {
-            "type": "integer",
-            "description": "Urgency level (1=High, 2=Medium, 3=Low)",
-            "enum": ["1", "2", "3"],
-            "example": 2
-          },
-          "assignment_group": {
-            "type": "string",
-            "description": "sys_id of the group to assign the incident to"
-          },
-          "assigned_to": {
-            "type": "string",
-            "description": "sys_id of the user to assign the incident to"
-          },
-          "cmdb_ci": {
-            "type": "string",
-            "description": "sys_id of the affected configuration item"
-          },
-          "contact_type": {
-            "type": "string",
-            "description": "How the incident was reported (e.g., 'phone', 'email', 'self-service')"
-          }
-        }
-      },
-      "IncidentUpdateRequest": {
-        "type": "object",
-        "description": "Fields for updating an incident. The 'number' field is read-only and auto-generated, so it should not be included in update requests. The 'sys_id' identifies which record to update and is specified in the URL path, not the request body.",
-        "properties": {
-          "state": {
-            "type": "integer",
-            "description": "Current state of the incident: 1 = New, 2 = In Progress, 3 = On Hold, 4 = Resolved, 6 = Resolved, 7 = Closed, 8 = Canceled",
-            "enum": ["1", "2", "3", "4", "6", "7", "8"],
-            "example": 2
-          },
-          "hold_reason": {
-            "type": "string",
-            "description": "Reason for putting incident on hold (required if state=3)",
-            "enum": ["Awaiting Caller", "Awaiting Change", "Awaiting Problem", "Awaiting Vendor"]
-          },
-          "short_description": {
-            "type": "string",
-            "description": "Brief description of the incident"
-          },
-          "description": {
-            "type": "string",
-            "description": "Detailed description"
-          },
-          "work_notes": {
-            "type": "string",
-            "description": "Internal work notes (not visible to caller)"
-          },
-          "comments": {
-            "type": "string",
-            "description": "Comments visible to the caller"
-          },
-          "assigned_to": {
-            "type": "string",
-            "description": "sys_id of assigned user"
-          },
-          "assignment_group": {
-            "type": "string",
-            "description": "sys_id of assigned group"
-          },
-          "close_code": {
-            "type": "string",
-            "description": "Closure code (required when resolving/closing)"
-          },
-          "close_notes": {
-            "type": "string",
-            "description": "Closure notes (required when resolving/closing)"
-          },
-          "resolution_code": {
-            "type": "string",
-            "description": "Resolution code"
-          },
-          "resolution_notes": {
-            "type": "string",
-            "description": "Resolution notes"
-          }
-        }
-      },
-      "IncidentResponse": {
-        "type": "object",
-        "properties": {
-          "result": {
-            "$ref": "#/components/schemas/IncidentRecord"
-          }
-        }
-      },
       "IncidentRecord": {
-        "type": "object",
-        "description": "Complete incident record schema including all system fields",
-        "properties": {
-          "sys_id": {
-            "type": "string",
-            "format": "uuid",
-            "readOnly": true,
-            "description": "Unique system identifier (auto-generated)"
-          },
-          "number": {
-            "type": "string",
-            "readOnly": true,
-            "description": "Incident number (auto-generated, e.g., INC0010017)",
-            "example": "INC0010017"
-          },
-          "state": {
-            "type": "integer",
-            "description": "Current state (1=New, 2=In Progress, 3=On Hold, 4=Resolved, 6=Resolved, 7=Closed, 8=Canceled)",
-            "enum": ["1", "2", "3", "4", "6", "7", "8"]
-          },
-          "short_description": {
-            "type": "string",
-            "description": "Brief description of the incident"
-          },
-          "description": {
-            "type": "string",
-            "description": "Detailed description"
-          },
-          "caller_id": {
-            "type": "string",
-            "description": "sys_id of the user reporting the incident"
-          },
-          "assigned_to": {
-            "type": "string",
-            "description": "sys_id of the assigned user"
-          },
-          "assignment_group": {
-            "type": "string",
-            "description": "sys_id of the assigned group"
-          },
-          "category": {
-            "type": "string",
-            "description": "Incident category"
-          },
-          "subcategory": {
-            "type": "string",
-            "description": "Incident subcategory"
-          },
-          "impact": {
-            "type": "integer",
-            "description": "Impact level (1=High, 2=Medium, 3=Low)",
-            "enum": ["1", "2", "3"]
-          },
-          "urgency": {
-            "type": "integer",
-            "description": "Urgency level (1=High, 2=Medium, 3=Low)",
-            "enum": ["1", "2", "3"]
-          },
-          "priority": {
-            "type": "integer",
-            "readOnly": true,
-            "description": "Priority (auto-calculated from impact and urgency)",
-            "enum": ["1", "2", "3", "4", "5"]
-          },
-          "active": {
-            "type": "boolean",
-            "description": "Whether the incident is active"
-          },
-          "opened_at": {
-            "type": "string",
-            "format": "date-time",
-            "readOnly": true,
-            "description": "When the incident was opened"
-          },
-          "opened_by": {
-            "type": "string",
-            "readOnly": true,
-            "description": "sys_id of user who opened the incident"
-          },
-          "closed_at": {
-            "type": "string",
-            "format": "date-time",
-            "readOnly": true,
-            "description": "When the incident was closed"
-          },
-          "closed_by": {
-            "type": "string",
-            "readOnly": true,
-            "description": "sys_id of user who closed the incident"
-          },
-          "resolved_at": {
-            "type": "string",
-            "format": "date-time",
-            "readOnly": true,
-            "description": "When the incident was resolved"
-          },
-          "resolved_by": {
-            "type": "string",
-            "readOnly": true,
-            "description": "sys_id of user who resolved the incident"
-          },
-          "work_notes": {
-            "type": "string",
-            "description": "Internal work notes"
-          },
-          "comments": {
-            "type": "string",
-            "description": "Customer-visible comments"
-          },
-          "close_code": {
-            "type": "string",
-            "description": "Closure code"
-          },
-          "close_notes": {
-            "type": "string",
-            "description": "Closure notes"
-          },
-          "sys_created_on": {
-            "type": "string",
-            "format": "date-time",
-            "readOnly": true,
-            "description": "Record creation timestamp"
-          },
-          "sys_created_by": {
-            "type": "string",
-            "readOnly": true,
-            "description": "User who created the record"
-          },
-          "sys_updated_on": {
-            "type": "string",
-            "format": "date-time",
-            "readOnly": true,
-            "description": "Last update timestamp"
-          },
-          "sys_updated_by": {
-            "type": "string",
-            "readOnly": true,
-            "description": "User who last updated the record"
-          }
-        }
-      },
-      "KnowledgeCreateRequest": {
-        "type": "object",
-        "required": ["short_description", "kb_knowledge_base", "text"],
-        "properties": {
-          "short_description": {
-            "type": "string",
-            "description": "Title/brief description of the article (required)",
-            "example": "How to Connect to the Office VPN on Windows"
-          },
-          "text": {
-            "type": "string",
-            "description": "Main content of the article in HTML format (required)",
-            "example": "<h1>VPN Setup</h1><p>Follow these steps...</p>"
-          },
-          
-          "author": {
-            "type": "string",
-            "description": "sys_id of the author"
-          },
-          "article_type": {
-            "type": "string",
-            "description": "Type of article content",
-            "enum": ["text", "wiki", "html"],
-            "default": "html"
-          },
-          "valid_to": {
-            "type": "string",
-            "format": "date",
-            "description": "Expiration date for the article",
-            "example": "2027-12-31"
-          },
-          "active": {
-            "type": "boolean",
-            "description": "Whether the article is active",
-            "default": true
-          }
-        }
-      },
-      "KnowledgeUpdateRequest": {
-        "type": "object",
-        "description": "Fields for updating a knowledge article. The 'number' is auto-generated and read-only. The 'workflow_state' may have restricted transitions based on user permissions.",
-        "properties": {
-          "short_description": {
-            "type": "string",
-            "description": "Title of the article"
-          },
-          "text": {
-            "type": "string",
-            "description": "Main content (HTML)"
-          },
-          "kb_category": {
-            "type": "string",
-            "description": "sys_id of the category"
-          },
-          "valid_to": {
-            "type": "string",
-            "format": "date",
-            "description": "Expiration date"
-          },
-          "active": {
-            "type": "boolean",
-            "description": "Active status"
-          },
-          "meta_description": {
-            "type": "string",
-            "description": "SEO meta description"
-          }
-        }
-      },
-      "KnowledgeResponse": {
-        "type": "object",
-        "properties": {
-          "result": {
-            "$ref": "#/components/schemas/KnowledgeRecord"
-          }
-        }
-      },
+  "type": "object",
+  "description": "Schema definition for a record in the 'incident' table.",
+  "properties": {
+    "active": { "type": "boolean" },
+    "activity_due": { "type": "string", "format": "date-time" },
+    "additional_assignee_list": { "type": "string" },
+    "approval": { "type": "string" },
+    "assigned_to": { "type": "string", "description": "sys_id of the user" },
+    "assignment_group": { "type": "string", "description": "sys_id of the group" },
+    "business_duration": { "type": "string" },
+    "caller_id": { "type": "string", "description": "sys_id of the user" },
+    "category": { "type": "string" },
+    "child_incidents": { "type": "integer", "readOnly": true, "description": "Number of child incidents linked" },
+    "close_code": { "type": "string" },
+    "close_notes": { "type": "string" },
+    "closed_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "closed_by": { "type": "string", "readOnly": true },
+    "cmdb_ci": { "type": "string", "description": "sys_id of the configuration item" },
+    "comments": { "type": "string" },
+    "comments_and_work_notes": { "type": "string" },
+    "company": { "type": "string", "description": "sys_id of the company" },
+    "contact_type": { "type": "string" },
+    "description": { "type": "string" },
+    "due_date": { "type": "string", "format": "date-time" },
+    "escalation": { "type": "integer" },
+    "expected_start": { "type": "string", "format": "date-time" },
+    "impact": { "type": "integer" },
+    "incident_state": { "type": "integer" },
+    "knowledge": { "type": "boolean" },
+    "location": { "type": "string", "description": "sys_id of the location" },
+    "made_sla": { "type": "boolean" },
+    "notify": { "type": "integer" },
+    "number": { "type": "string", "readOnly": true },
+    "opened_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "opened_by": { "type": "string", "readOnly": true },
+    "parent": { "type": "string", "description": "sys_id of the parent task/record" },
+    "parent_incident": { "type": "string", "description": "sys_id of the parent incident (if applicable)" },
+    "priority": { "type": "integer" },
+    "problem_id": { "type": "string" },
+    "reassignment_count": { "type": "integer", "readOnly": true },
+    "resolved_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "resolved_by": { "type": "string", "readOnly": true },
+    "rfc": { "type": "string" },
+    "severity": { "type": "integer" },
+    "short_description": { "type": "string" },
+    "watch_list": { "type": "string" },
+    "sla_due": { "type": "string", "format": "date-time" },
+    "state": {
+      "type": "integer",
+      "description": "The display value of the record's current state. (Note: ServiceNow API often returns numeric values instead).Indicates the current status of the incident, where 1 = New, 2 = In Progress, 3 = On Hold, 4 = Resolved, 5 = Closed, and 6 = Cancelled."
+      
+    },
+    "hold_reason": {
+      "type": "string",
+      "description": "Reason a record is on hold (if state = On Hold).",
+      "enum": ["Awaiting Caller", "Awaiting Change", "Awaiting Problem", "Awaiting Vendor"]
+    },
+    "subcategory": { "type": "string" },
+    "sys_class_name": { "type": "string" },
+    "sys_created_by": { "type": "string", "readOnly": true },
+    "sys_created_on": { "type": "string", "format": "date-time", "readOnly": true },
+    "sys_domain": { "type": "string" },
+    "sys_id": { "type": "string", "format": "uuid", "readOnly": true },
+    "sys_mod_count": { "type": "integer", "readOnly": true },
+    "sys_updated_by": { "type": "string", "readOnly": true },
+    "sys_updated_on": { "type": "string", "format": "date-time", "readOnly": true },
+    "urgency": { "type": "integer" },
+    "work_notes": { "type": "string" }
+  },
+  "example": {
+    "caller_id": "6816f79cc0a8016401c5a33be04be441",
+    "short_description": "Email server is slow",
+    "category": "software",
+    "impact": 2,
+    "urgency": 2,
+    "priority": 3,
+    "made_sla": true,
+    "active": true
+  }
+       },
+
       "KnowledgeRecord": {
-        "type": "object",
-        "description": "Complete knowledge article record",
-        "properties": {
-          "sys_id": {
-            "type": "string",
-            "format": "uuid",
-            "readOnly": true,
-            "description": "Unique system identifier"
-          },
-          "number": {
-            "type": "string",
-            "readOnly": true,
-            "description": "Knowledge article number (auto-generated, e.g., KB0010001)"
-          },
-          "short_description": {
-            "type": "string",
-            "description": "Article title"
-          },
-          "text": {
-            "type": "string",
-            "description": "Main article content (HTML)"
-          },
-          "kb_knowledge_base": {
-            "type": "string",
-            "description": "sys_id of the knowledge base"
-          },
-          "kb_category": {
-            "type": "string",
-            "description": "sys_id of the category"
-          },
-          "author": {
-            "type": "string",
-            "description": "sys_id of the author"
-          },
-          "article_type": {
-            "type": "string",
-            "enum": ["text", "wiki", "html"]
-          },
-          "workflow_state": {
-            "type": "string",
-            "readOnly": true,
-            "description": "Current workflow state",
-            "enum": ["draft", "review", "published", "pending_retirement", "retired", "outdated"]
-          },
-          "active": {
-            "type": "boolean",
-            "description": "Active status"
-          },
-          "published": {
-            "type": "string",
-            "format": "date-time",
-            "readOnly": true,
-            "description": "Publication timestamp"
-          },
-          "valid_to": {
-            "type": "string",
-            "format": "date",
-            "description": "Expiration date"
-          },
-          "rating": {
-            "type": "number",
-            "readOnly": true,
-            "description": "Average user rating"
-          },
-          "sys_view_count": {
-            "type": "integer",
-            "readOnly": true,
-            "description": "Number of views"
-          },
-          "sys_created_on": {
-            "type": "string",
-            "format": "date-time",
-            "readOnly": true
-          },
-          "sys_updated_on": {
-            "type": "string",
-            "format": "date-time",
-            "readOnly": true
-          }
-        }
+    "type": "object",
+    "description": "Schema definition for a record in the 'kb_knowledge' table.",
+    "properties": {
+      "active": { "type": "boolean" },
+      "article_type": { "type": "string", "enum": ["text", "wiki", "html"] },
+      "author": { "type": "string", "description": "sys_id of the authoring user" },
+      "disable_commenting": { "type": "boolean" },
+      "disable_suggesting": { "type": "boolean" },
+      "display_attachments": { "type": "boolean" },
+      "flagged": { "type": "boolean" },
+      "kb_category": { "type": "string", "description": "sys_id of the knowledge category" },
+      "kb_knowledge_base": { "type": "string", "description": "sys_id of the knowledge base" },
+      "meta": { "type": "string" },
+      "meta_description": { "type": "string" },
+      "ownership_group": { "type": "string", "description": "sys_id of the ownership group" },
+      "published": { "type": "string", "format": "date-time", "readOnly": true },
+      "rating": { "type": "number", "readOnly": true },
+      "roles": { "type": "string", "description": "Comma-separated list of roles that can view" },
+      "scheduled_publish_date": { "type": "string", "format": "date-time" },
+      "short_description": { "type": "string" },
+      "text": { "type": "string", "description": "The main body of the article (HTML content)" },
+      "valid_to": { "type": "string", "format": "date" },
+      "workflow_state": {
+          "type": "string",
+          "description": "The current lifecycle state of the knowledge article.",
+          "readOnly": true,
+          "enum": [
+            "draft",
+            "review",
+            "published",
+            "pending_retirement",
+            "retired",
+            "outdated"
+          ]
+        },
+      "number": { "type": "string", "readOnly": true },
+      "sys_id": { "type": "string", "format": "uuid", "readOnly": true },
+      "sys_view_count": { "type": "integer", "readOnly": true }
+    },
+    "example":{
+  "short_description": "How to Connect to the Office VPN on Windows",
+  "kb_knowledge_base": "a73c11dcdb533300fb7656b6gf961922",
+  "kb_category": "b54f4695c611227a01b54122e8006d22",
+  "author": "6816f79cc0a8016401c5a33be04be441",
+  "article_type": "html",
+  "active": true,
+  "valid_to": "2027-12-31",
+  "text": "<h1>Connecting to the VPN</h1><p>Follow these steps to connect to the corporate Virtual Private Network (VPN) from your Windows device.</p><strong>Prerequisites:</strong><ul><li>You must have the GlobalProtect VPN client installed.</li><li>You must have your multi-factor authentication (MFA) device ready.</li></ul><p>Please contact the IT Help Desk if you need assistance with the client installation.</p>"
+}
+       }, 
+      "ServiceRequestRecord": {
+    "type": "object",
+    "description": "Schema definition for a record in the 'sc_request' (Service Request) table.",
+    "properties": {
+      "active": {
+        "type": "boolean"
       },
-      "UserRecord": {
-        "type": "object",
-        "properties": {
-          "sys_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "user_name": {
-            "type": "string",
-            "description": "Login username"
-          },
-          "first_name": {
-            "type": "string"
-          },
-          "last_name": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string",
-            "format": "email"
-          },
-          "phone": {
-            "type": "string"
-          },
-          "mobile_phone": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string",
-            "description": "Job title"
-          },
-          "department": {
-            "type": "string",
-            "description": "sys_id of department"
-          },
-          "location": {
-            "type": "string",
-            "description": "sys_id of location"
-          },
-          "active": {
-            "type": "boolean"
-          }
-        }
+      "approval": {
+        "type": "string",
+        "enum": ["approved", "rejected", "requested"]
       },
-      "CurrentUserRecord": {
-        "type": "object",
-        "properties": {
-          "sys_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "user_name": {
-            "type": "string"
-          },
-          "first_name": {
-            "type": "string"
-          },
-          "last_name": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "roles": {
-            "type": "string",
-            "description": "Comma-separated list of roles"
-          },
-          "active": {
-            "type": "boolean"
-          }
-        }
+      "assigned_to": {
+        "type": "string",
+        "description": "sys_id of the assigned user."
+      },
+      "assignment_group": {
+        "type": "string",
+        "description": "sys_id of the assignment group."
+      },
+      "close_notes": {
+        "type": "string"
+      },
+      "closed_at": {
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true
+      },
+      "comments": {
+        "type": "string"
+      },
+      "company": {
+        "type": "string",
+        "description": "sys_id of the company."
+      },
+      "description": {
+        "type": "string"
+      },
+      "due_date": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "escalation": {
+        "type": "integer"
+      },
+      "expected_start": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "impact": {
+        "type": "integer"
+      },
+      "knowledge": {
+        "type": "boolean"
+      },
+      "location": {
+        "type": "string",
+        "description": "sys_id of the location."
+      },
+      "made_sla": {
+        "type": "boolean"
+      },
+      "number": {
+        "type": "string",
+        "readOnly": true
+      },
+      "opened_at": {
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true
+      },
+      "opened_by": {
+        "type": "string",
+        "description": "sys_id of the user who opened the request.",
+        "readOnly": true
+      },
+      "price": {
+        "type": "number",
+        "format": "double"
+      },
+      "priority": {
+        "type": "integer"
+      },
+      "reassignment_count": {
+        "type": "integer",
+        "readOnly": true
+      },
+      "request_state": {
+        "type": "string"
+      },
+      "requested_for": {
+        "type": "string",
+        "description": "sys_id of the user the request is for."
+      },
+      "short_description": {
+        "type": "string"
+      },
+      "special_instructions": {
+        "type": "string"
+      },
+      "stage": {
+        "type": "string"
+      },
+      "state": {
+        "type": "integer"
+      },
+      "sys_created_on": {
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true
+      },
+      "sys_id": {
+        "type": "string",
+        "format": "uuid",
+        "readOnly": true
+      },
+      "sys_updated_on": {
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true
+      },
+      "urgency": {
+        "type": "integer"
+      },
+      "watch_list": {
+        "type": "string",
+        "description": "Comma-separated list of user sys_ids."
+      },
+      "work_notes": {
+        "type": "string"
+      }
+    },
+    "example": {
+      "requested_for": "6816f79cc0a8016401c5a33be04be441",
+      "short_description": "New Laptop Request for Alice Johnson",
+      "description": "Requesting a standard developer laptop (Model X-15) for a new hire, Alice Johnson.",
+      "urgency": 2,
+      "impact": 2,
+      "price": 1800.00
+    }
       },
       "TableApiSingleResponse": {
         "type": "object",
@@ -1329,7 +883,12 @@
           "result": {
             "type": "object",
             "additionalProperties": true,
-            "description": "The record data (schema varies by table)"
+            "description": "The resulting record. The specific fields depend on the table queried. The example shows an Incident record.",
+            "example": {
+              "sys_id": "5a99085d8388b210fd669defeeaad3e0",
+              "number": "INC0010017",
+              "short_description": "Email server is slow"
+            }
           }
         }
       },
@@ -1341,103 +900,11 @@
             "items": {
               "type": "object",
               "additionalProperties": true
-            },
-            "description": "Array of records (schema varies by table)"
-          }
-        }
-      },
-      "ErrorResponse": {
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "object",
-            "properties": {
-              "message": {
-                "type": "string",
-                "description": "Error message"
-              },
-              "detail": {
-                "type": "string",
-                "description": "Detailed error information"
-              }
-            }
-          },
-          "status": {
-            "type": "string",
-            "description": "HTTP status code"
-          }
-        }
-      }
-    },
-    "responses": {
-      "BadRequest": {
-        "description": "Bad Request - Invalid input or missing required fields",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/ErrorResponse"
-            },
-            "example": {
-              "error": {
-                "message": "Invalid field value",
-                "detail": "Field 'state' must be an integer between 1 and 8"
-              },
-              "status": "400"
-            }
-          }
-        }
-      },
-      "Unauthorized": {
-        "description": "Unauthorized - Authentication required or failed",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/ErrorResponse"
-            },
-            "example": {
-              "error": {
-                "message": "Authentication required",
-                "detail": "User must be authenticated to access this resource"
-              },
-              "status": "401"
-            }
-          }
-        }
-      },
-      "Forbidden": {
-        "description": "Forbidden - Insufficient permissions",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/ErrorResponse"
-            },
-            "example": {
-              "error": {
-                "message": "Access denied",
-                "detail": "User does not have permission to perform this operation"
-              },
-              "status": "403"
-            }
-          }
-        }
-      },
-      "NotFound": {
-        "description": "Not Found - Resource does not exist",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/ErrorResponse"
-            },
-            "example": {
-              "error": {
-                "message": "Record not found",
-                "detail": "No record found with the specified sys_id"
-              },
-              "status": "404"
             }
           }
         }
       }
+      
     }
   }
 }
