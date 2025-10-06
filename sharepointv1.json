@@ -1,0 +1,1304 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "SharePoint Site and List API",
+        "version": "v1"
+    },
+    "servers": [
+        {
+            "url": "https://graph.microsoft.com/v1.0"
+        }
+    ],
+    "paths": {
+        "/sites": {
+            "get": {
+                "summary": "List and search SharePoint sites",
+                "description": "Get all sites the signed-in user can access. Use search=* to get all sites or specify keywords. Use $select for performance optimization.",
+                "operationId": "sites_site_list_site",
+                "tags": [
+                    "Sites"
+                ],
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search query. Use '*' for all sites or specify keywords like 'ProjectX'",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "*",
+                            "example": "*"
+                        }
+                    },
+                    {
+                        "name": "$select",
+                        "in": "query",
+                        "description": "Comma-separated list of properties to select for performance optimization",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "id,displayName,webUrl,createdDateTime"
+                        }
+                    },
+                    {
+                        "name": "$top",
+                        "in": "query",
+                        "description": "Number of results to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 999,
+                            "default": 50,
+                            "example": 5
+                        }
+                    },
+                    {
+                        "name": "$orderby",
+                        "in": "query",
+                        "description": "Sort order (e.g., 'displayName desc')",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "displayName desc"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SitesResponse"
+                                },
+                                "examples": {
+                                    "allSites": {
+                                        "summary": "Get all sites",
+                                        "value": {
+                                            "value": [
+                                                {
+                                                    "displayName": "Project Alpha Team Site",
+                                                    "webUrl": "https://contoso.sharepoint.com/sites/ProjectAlpha",
+                                                    "createdDateTime": "2024-01-15T10:30:00Z",
+                                                    "lastModifiedDateTime": "2024-09-20T14:22:00Z",
+                                                    "description": "Main collaboration site for Project Alpha"
+                                                },
+                                                {
+                                                    "displayName": "HR Portal",
+                                                    "webUrl": "https://contoso.sharepoint.com/sites/HR",
+                                                    "createdDateTime": "2023-11-05T09:15:00Z",
+                                                    "lastModifiedDateTime": "2024-09-25T11:45:00Z",
+                                                    "description": "Human Resources information portal"
+                                                }
+                                            ],
+                                            "@odata.nextLink": "https://graph.microsoft.com/v1.0/sites?search=*&$skiptoken=abc123"
+                                        }
+                                    },
+                                    "searchByKeyword": {
+                                        "summary": "Search sites by 'ProjectX'",
+                                        "value": {
+                                            "value": [
+                                                {
+                                                    "displayName": "ProjectX Team Site",
+                                                    "webUrl": "https://contoso.sharepoint.com/sites/ProjectX",
+                                                    "createdDateTime": "2024-03-10T09:15:00Z"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Insufficient permissions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-codeSamples": [
+                    {
+                        "lang": "curl",
+                        "source": "curl --location 'https://graph.microsoft.com/v1.0/sites?search=*' \\\n--header 'Authorization: Bearer YOUR_TOKEN'"
+                    },
+                    {
+                        "lang": "curl",
+                        "label": "Search by keyword",
+                        "source": "curl --location 'https://graph.microsoft.com/v1.0/sites?search=ProjectX' \\\n--header 'Authorization: Bearer YOUR_TOKEN'"
+                    },
+                    {
+                        "lang": "curl",
+                        "label": "Optimized with $select",
+                        "source": "curl --location 'https://graph.microsoft.com/v1.0/sites?search=*&$select=id,displayName,webUrl' \\\n--header 'Authorization: Bearer YOUR_TOKEN'"
+                    }
+                ]
+            }
+        },
+        "/me": {
+            "get": {
+                "summary": "Get current user details",
+                "operationId": "get_user_details",
+                "description": "Retrieves the properties of the currently authenticated user.",
+                "responses": {
+                    "200": {
+                        "description": "Successful response with user details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "displayName": {
+                                            "type": "string"
+                                        },
+                                        "givenName": {
+                                            "type": "string"
+                                        },
+                                        "surname": {
+                                            "type": "string"
+                                        },
+                                        "mail": {
+                                            "type": "string"
+                                        },
+                                        "userPrincipalName": {
+                                            "type": "string"
+                                        },
+                                        "jobTitle": {
+                                            "type": "string"
+                                        },
+                                        "mobilePhone": {
+                                            "type": "string"
+                                        },
+                                        "officeLocation": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/sites/{site-id}": {
+            "get": {
+                "summary": "Get site information",
+                "operationId": "sites_get_site",
+                "parameters": [
+                    {
+                        "name": "site-id",
+                        "in": "path",
+                        "required": true,
+                        "description": "The ID of the SharePoint site",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Site"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "Retrieve the metadata and relationships of a specific SharePoint site by ID or path."
+            }
+        },
+        "/sites/{site-id}/drives/{drive-id}": {
+            "get": {
+                "summary": "Get a document library (drive) from a site",
+                "operationId": "sites_get_drive",
+                "parameters": [
+                    {
+                        "name": "site-id",
+                        "in": "path",
+                        "required": true,
+                        "description": "The ID of the SharePoint site",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "drive-id",
+                        "in": "path",
+                        "required": true,
+                        "description": "The ID of the document library (drive)",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Drive"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "Get the default drive (document library) associated with a particular SharePoint site."
+            }
+        },
+        "/sites/{site-id}/drives": {
+            "get": {
+                "summary": "List a site's document libraries",
+                "operationId": "sites_list_drives",
+                "parameters": [
+                    {
+                        "name": "site-id",
+                        "in": "path",
+                        "required": true,
+                        "description": "The ID of the SharePoint site",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "value": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Drive"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "List all drives (document libraries) under a given SharePoint site. Useful when a site has multiple libraries."
+            }
+        },
+        "/sites/{site-id}/lists": {
+            "get": {
+                "summary": "List a site's lists",
+                "operationId": "sites_list_lists",
+                "parameters": [
+                    {
+                        "name": "site-id",
+                        "in": "path",
+                        "required": true,
+                        "description": "The ID of the SharePoint site",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "value": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/List"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "Get all the lists (including custom lists) defined in a SharePoint site."
+            },
+            "post": {
+                "summary": "Create a new list on a site",
+                "operationId": "sites_create_lists",
+                "parameters": [
+                    {
+                        "name": "site-id",
+                        "in": "path",
+                        "required": true,
+                        "description": "The ID of the SharePoint site",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "displayName": {
+                                        "type": "string",
+                                        "description": "The display name of the list"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "description": "The URL name of the list"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "List created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/List"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/sites/{site-id}/lists/{list-id}": {
+            "get": {
+                "summary": "Get a specific list from a site",
+                "operationId": "sites_get_lists",
+                "parameters": [
+                    {
+                        "name": "site-id",
+                        "in": "path",
+                        "required": true,
+                        "description": "The ID of the SharePoint site",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "list-id",
+                        "in": "path",
+                        "required": true,
+                        "description": "The ID of the list",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/List"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "Retrieve a specific list in a SharePoint site by its ID or name, including metadata like column definitions and settings."
+            },
+            "patch": {
+                "summary": "Update properties of a list",
+                "operationId": "sites_update_lists",
+                "parameters": [
+                    {
+                        "name": "site-id",
+                        "in": "path",
+                        "required": true,
+                        "description": "The ID of the SharePoint site",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "list-id",
+                        "in": "path",
+                        "required": true,
+                        "description": "The ID of the list",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "displayName": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "List updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/List"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete a list from a site",
+                "operationId": "sites_delete_lists",
+                "parameters": [
+                    {
+                        "name": "site-id",
+                        "in": "path",
+                        "required": true,
+                        "description": "The ID of the SharePoint site",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "list-id",
+                        "in": "path",
+                        "required": true,
+                        "description": "The ID of the list",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "List deleted successfully"
+                    }
+                }
+            }
+        },
+        "/sites/{site-id}/lists/{list-id}/items": {
+            "get": {
+                "summary": "List all items in a list",
+                "operationId": "sites_lists_list_items",
+                "parameters": [
+                    {
+                        "name": "site-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "list-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "value": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ListItem"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "List all items (rows) in a specified list (within the site). Supports $expand=fields to fetch field values."
+            },
+            "post": {
+                "summary": "Create a new item in a list",
+                "operationId": "sites_lists_create_items",
+                "parameters": [
+                    {
+                        "name": "site-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "list-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "fields": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Item created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ListItem"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/sites/{site-id}/lists/{list-id}/items/{item-id}": {
+            "get": {
+                "summary": "Get a specific item from a list",
+                "operationId": "sites_lists_get_items",
+                "parameters": [
+                    {
+                        "name": "site-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "list-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "item-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ListItem"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "Get specific list items (one or more) in a list, possibly filtering or selecting fields."
+            },
+            "patch": {
+                "summary": "Update a specific item in a list",
+                "operationId": "sites_lists_update_items",
+                "parameters": [
+                    {
+                        "name": "site-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "list-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "item-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "fields": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Item updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ListItem"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete a specific item from a list",
+                "operationId": "sites_lists_delete_items",
+                "parameters": [
+                    {
+                        "name": "site-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "list-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "item-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Item deleted successfully"
+                    }
+                }
+            }
+        },
+        "/sites/{site-id}/lists/{list-id}/items/{item-id}/versions": {
+            "get": {
+                "summary": "List all versions of a list item",
+                "operationId": "sites_lists_items_list_versions",
+                "parameters": [
+                    {
+                        "name": "site-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "list-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "item-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "value": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ListItemVersion"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "List all versions of a specific list item (i.e. revision history) for an item in a list."
+            }
+        },
+        "/sites/{site-id}/lists/{list-id}/items/{item-id}/versions/{version-id}": {
+            "get": {
+                "summary": "Get a specific version of a list item",
+                "operationId": "sites_lists_items_get_versions",
+                "parameters": [
+                    {
+                        "name": "site-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "list-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "item-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "version-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ListItemVersion"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "Retrieve version details for a list item: e.g. when it was changed, by whom, etc."
+            }
+        },
+        "/sites/{site-id}/lists/{list-id}/items/{item-id}/versions/{version-id}/fields": {
+            "get": {
+                "summary": "Get fields for a specific list item version",
+                "operationId": "sites_lists_items_versions_get_fields",
+                "parameters": [
+                    {
+                        "name": "site-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "list-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "item-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "version-id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "For a specific version of a list item, get the field values / properties at that version."
+            }
+        },
+        "/sites/{site-id}/pages": {
+      "get": {
+        "summary": "List all pages in a SharePoint site",
+        "description": "Retrieve all pages in a specified SharePoint site, supporting search, filtering, ordering, and pagination. use getSitePage to get full site details ",
+        "operationId": "listSitePages",
+        "parameters": [
+          { "name": "site-id", "in": "path", "required": true, "description": "The unique identifier of the SharePoint site", "schema": { "type": "string" } },
+          { "name": "$search", "in": "query", "required": false, "description": "Search pages by keyword in title or content", "schema": { "type": "string" } },
+          { "name": "$filter", "in": "query", "required": false, "description": "Filter pages by promotedState (news/articles), createdBy, createdDateTime, lastModifiedDateTime", "schema": { "type": "string" } },
+          { "name": "$orderby", "in": "query", "required": false, "description": "Order pages by a property", "schema": { "type": "string" } },
+          { "name": "$top", "in": "query", "required": false, "description": "Limit the number of results returned", "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "List of site pages retrieved successfully" } },
+        "x-codeSamples": [
+          { "lang": "curl", "source": "curl --location 'https://graph.microsoft.com/v1.0/sites/{site-id}/pages?$search=report&$filter=createdBy/userPrincipalName eq \"user@domain.com\"&$orderby=lastModifiedDateTime desc&$top=10' \\\n--header 'Authorization: Bearer YOUR_TOKEN'" },
+          { "lang": "curl", "source": "curl --location 'https://graph.microsoft.com/v1.0/sites/{site-id}/pages?$search=\"Quarterly Report\"&$filter=promotedState eq 2&$orderby=lastModifiedDateTime desc&$top=5' \\\n--header 'Authorization: Bearer YOUR_TOKEN'" }
+        ]
+      },
+      "post": {
+        "summary": "Create a new page in a SharePoint site",
+        "description": "Create a new page in the specified SharePoint site by providing page details in the request body.",
+        "operationId": "createSitePage",
+        "parameters": [
+          { "name": "site-id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "description": "Page details to create",
+          "required": true,
+          "content": { "application/json": { "schema": { "type": "object" } } }
+        },
+        "responses": { "201": { "description": "Page created successfully" } },
+        "x-codeSamples": [
+          { "lang": "curl", "source": "curl --location 'https://graph.microsoft.com/v1.0/sites/{site-id}/pages' \\\n--header 'Authorization: Bearer YOUR_TOKEN' \\\n--header 'Content-Type: application/json' \\\n--data '{\"name\":\"NewPage\",\"title\":\"My Page\"}'" }
+        ]
+      }
+        },
+        "/sites/{site-id}/pages/{page-id}": {
+        "get": {
+            "summary": "Get a specific page in a SharePoint site",
+            "description": "Retrieve the details of a specific page in a SharePoint site by page ID.,use listSitePages to get all pages and their page ID  ",
+            "operationId": "getSitePage",
+            "parameters": [
+            { "name": "site-id", "in": "path", "required": true, "schema": { "type": "string" } },
+            { "name": "page-id", "in": "path", "required": true, "schema": { "type": "string" } },
+            { "name": "format", "in": "query", "required": false, "description": "Specify 'text' to get plain textual content", "schema": { "type": "string", "enum": ["text"] } }
+            ],
+            "responses": { "200": { "description": "Page details retrieved successfully" } },
+            "x-codeSamples": [
+            { "lang": "curl", "source": "curl --location 'https://graph.microsoft.com/v1.0/sites/{site-id}/pages/{page-id}' \\\n--header 'Authorization: Bearer YOUR_TOKEN'" },
+             { "lang": "curl", "source": "curl --location 'https://graph.microsoft.com/v1.0/sites/{site-id}/pages/{page-id}/content?format=text' \\\n--header 'Authorization: Bearer YOUR_TOKEN'" }
+            ]
+        },
+        "patch": {
+            "summary": "Update a page in a SharePoint site",
+            "description": "Update the properties of an existing page in a SharePoint site by providing changes in the request body.",
+            "operationId": "updateSitePage",
+            "parameters": [
+            { "name": "site-id", "in": "path", "required": true, "schema": { "type": "string" } },
+            { "name": "page-id", "in": "path", "required": true, "schema": { "type": "string" } }
+            ],
+            "requestBody": {
+            "description": "Page details to update",
+            "required": true,
+            "content": { "application/json": { "schema": { "type": "object" } } }
+            },
+            "responses": { "200": { "description": "Page updated successfully" } },
+            "x-codeSamples": [
+            { "lang": "curl", "source": "curl --location 'https://graph.microsoft.com/v1.0/sites/{site-id}/pages/{page-id}' \\\n--header 'Authorization: Bearer YOUR_TOKEN' \\\n--header 'Content-Type: application/json' \\\n--data '{\"title\":\"Updated Page Title\"}'" }
+            ]
+        },
+        "delete": {
+            "summary": "Delete a page in a SharePoint site",
+            "description": "Delete an existing page in a SharePoint site by its page ID.",
+            "operationId": "deleteSitePage",
+            "parameters": [
+            { "name": "site-id", "in": "path", "required": true, "schema": { "type": "string" } },
+            { "name": "page-id", "in": "path", "required": true, "schema": { "type": "string" } }
+            ],
+            "responses": { "204": { "description": "Page deleted successfully" } },
+            "x-codeSamples": [
+            { "lang": "curl", "source": "curl --location --request DELETE 'https://graph.microsoft.com/v1.0/sites/{site-id}/pages/{page-id}' \\\n--header 'Authorization: Bearer YOUR_TOKEN'" }
+            ]
+        }
+        },
+        "/sites/{site-id}/drives/{drive-id}/root/children": {
+    "get": {
+      "summary": "List documents and folders in a SharePoint drive",
+      "description": "Retrieve all documents and folders in a SharePoint drive, supporting search, filtering by creator, creation date, ordering, and pagination.",
+      "operationId": "listDriveChildren",
+      "parameters": [
+        { "name": "site-id", "in": "path", "required": true, "schema": { "type": "string" }, "description": "The unique identifier of the SharePoint site" },
+        { "name": "drive-id", "in": "path", "required": true, "schema": { "type": "string" }, "description": "The unique identifier of the document library (drive)" },
+        { "name": "$search", "in": "query", "required": false, "description": "Search files/folders by name or keywords", "schema": { "type": "string" } },
+        { "name": "$filter", "in": "query", "required": false, "description": "Filter files/folders by metadata (createdBy, createdDateTime, lastModifiedDateTime, etc.)", "schema": { "type": "string" } },
+        { "name": "$orderby", "in": "query", "required": false, "description": "Sort files/folders by a property (e.g., lastModifiedDateTime desc)", "schema": { "type": "string" } },
+        { "name": "$top", "in": "query", "required": false, "description": "Limit the number of results returned", "schema": { "type": "integer" } }
+      ],
+      "responses": { "200": { "description": "List of files/folders retrieved successfully" } },
+      "x-codeSamples": [
+        {
+          "lang": "curl",
+          "source": "curl --location 'https://graph.microsoft.com/v1.0/sites/{site-id}/drives/{drive-id}/root/children?$search=\"Quarterly Report\"' \\\n--header 'Authorization: Bearer YOUR_TOKEN'"
+        },
+        {
+          "lang": "curl",
+          "source": "curl --location 'https://graph.microsoft.com/v1.0/sites/{site-id}/drives/{drive-id}/root/children?$filter=createdBy/userPrincipalName eq \"john.doe@domain.com\"' \\\n--header 'Authorization: Bearer YOUR_TOKEN'"
+        },
+        {
+          "lang": "curl",
+          "source": "curl --location 'https://graph.microsoft.com/v1.0/sites/{site-id}/drives/{drive-id}/root/children?$filter=createdDateTime ge 2025-01-01T00:00:00Z' \\\n--header 'Authorization: Bearer YOUR_TOKEN'"
+        },
+        {
+          "lang": "curl",
+          "source": "curl --location 'https://graph.microsoft.com/v1.0/sites/{site-id}/drives/{drive-id}/root/children?$orderby=lastModifiedDateTime desc' \\\n--header 'Authorization: Bearer YOUR_TOKEN'"
+        },
+        {
+          "lang": "curl",
+          "source": "curl --location 'https://graph.microsoft.com/v1.0/sites/{site-id}/drives/{drive-id}/root/children?$top=5' \\\n--header 'Authorization: Bearer YOUR_TOKEN'"
+        },
+        {
+          "lang": "curl",
+          "source": "curl --location 'https://graph.microsoft.com/v1.0/sites/{site-id}/drives/{drive-id}/root/children?$search=\"Report\"&$filter=createdBy/userPrincipalName eq \"john.doe@domain.com\" and createdDateTime ge 2025-01-01T00:00:00Z&$orderby=lastModifiedDateTime desc&$top=10' \\\n--header 'Authorization: Bearer YOUR_TOKEN'"
+        }
+      ]
+    }
+        },
+         "/sites/{site-id}/drives/{drive-id}/items/{item-id}/content": {
+      "get": {
+        "summary": "Read the contents of a document as text",
+        "description": "Retrieve the content of a document in a SharePoint drive as plain text. For text-based files (TXT, CSV, JSON) this returns the content directly. For Office files (DOCX, PPTX), use ?format=text to get textual content.",
+        "operationId": "readDocumentContentAsText",
+        "parameters": [
+          {
+            "name": "site-id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the SharePoint site",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "drive-id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the document library (drive)",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "item-id",
+            "in": "path",
+            "required": true,
+            "description": "The unique identifier of the file (DriveItem)",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Specify 'text' to retrieve the content as plain text (useful for Office files)",
+            "schema": { "type": "string", "enum": ["text"] }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Document content retrieved successfully as text",
+            "content": {
+              "text/plain": {
+                "schema": { "type": "string" }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "curl",
+            "source": "curl --location 'https://graph.microsoft.com/v1.0/sites/{site-id}/drives/{drive-id}/items/{item-id}/content?format=text' \\\n--header 'Authorization: Bearer YOUR_TOKEN'"
+          }
+        ]
+      }
+        }, 
+        "/sites/{site-id}/pages/{page-id}/analytics": {
+        "get": {
+            "summary": "Get analytics for a page",
+            "description": "Retrieve analytics data for a page including total views, unique views, last activity, and user activity. Supports filtering by date and limiting results.",
+            "operationId": "getPageAnalytics",
+            "parameters": [
+            { "name": "site-id", "in": "path", "required": true, "schema": { "type": "string" } },
+            { "name": "page-id", "in": "path", "required": true, "schema": { "type": "string" } },
+            { "name": "$filter", "in": "query", "required": false, "description": "Filter analytics by lastModifiedDateTime or user activity", "schema": { "type": "string" } },
+            { "name": "$top", "in": "query", "required": false, "description": "Limit the number of analytics records returned", "schema": { "type": "integer" } },
+            { "name": "$orderby", "in": "query", "required": false, "description": "Order analytics by views or last activity", "schema": { "type": "string" } }
+            ],
+            "responses": { "200": { "description": "Page analytics retrieved successfully" } },
+            "x-codeSamples": [
+            { "lang": "curl", "source": "curl --location 'https://graph.microsoft.com/v1.0/sites/{site-id}/pages/{page-id}/analytics?$filter=lastModifiedDateTime ge 2025-01-01T00:00:00Z&$top=10' \\\n--header 'Authorization: Bearer YOUR_TOKEN'" }
+            ]
+        }
+        },
+        "/sites/{site-id}/pages/{page-id}/content": {
+        "get": {
+            "summary": "Read the contents of a page",
+            "description": "Retrieve the content of a page as HTML or text. Supports extracting textual content from news, articles, and standard pages.",
+            "operationId": "readPageContent",
+            "parameters": [
+            { "name": "site-id", "in": "path", "required": true, "schema": { "type": "string" } },
+            { "name": "page-id", "in": "path", "required": true, "schema": { "type": "string" } },
+            { "name": "format", "in": "query", "required": false, "description": "Specify 'text' to get plain textual content", "schema": { "type": "string", "enum": ["text"] } }
+            ],
+            "responses": { "200": { "description": "Page content retrieved successfully", "content": { "text/plain": { "schema": { "type": "string" } } } } },
+            "x-codeSamples": [
+            { "lang": "curl", "source": "curl --location 'https://graph.microsoft.com/v1.0/sites/{site-id}/pages/{page-id}/content?format=text' \\\n--header 'Authorization: Bearer YOUR_TOKEN'" }
+            ]
+        }
+        },
+        "/search/query": {
+        "post": {
+            "summary": "Search SharePoint content for high-interest topics",
+            "description": "Execute a search query across SharePoint sites, drives, and lists. Aggregates search terms to identify frequently searched content and high-interest topics.",
+            "operationId": "searchSharePointContent",
+            "requestBody": {
+            "required": true,
+            "content": {
+                "application/json": {
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                    "requests": {
+                        "type": "array",
+                        "items": {
+                        "type": "object",
+                        "properties": {
+                            "entityTypes": { "type": "array", "items": { "type": "string" } },
+                            "query": { "type": "object", "properties": { "queryString": { "type": "string" } } },
+                            "aggregationFilters": { "type": "array", "items": { "type": "string" } },
+                            "from": { "type": "integer" },
+                            "size": { "type": "integer" }
+                        },
+                        "required": ["entityTypes", "query"]
+                        }
+                    }
+                    }
+                }
+                }
+            }
+            },
+            "responses": { "200": { "description": "Search results with aggregated high-interest topics" } },
+            "x-codeSamples": [
+            {
+                "lang": "curl",
+                "source": "curl --location 'https://graph.microsoft.com/v1.0/search/query' \\\n--header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \\\n--header 'Content-Type: application/json' \\\n--data-raw '{\"requests\":[{\"entityTypes\":[\"site\",\"listItem\",\"driveItem\"],\"query\":{\"queryString\":\"*\"},\"aggregationFilters\":[\"searchTerms\"],\"from\":0,\"size\":50}]}'"
+            }
+            ]
+        }
+        },
+        "/reports/getSharePointSiteUsageDetail(period='{period}')": {
+        "get": {
+            "summary": "Get SharePoint site usage and search analytics",
+            "description": "Retrieve analytics data on SharePoint site usage, including popular searches and high-interest content trends. Use periods like D7, D30, or D90.",
+            "operationId": "getSharePointSiteUsage",
+            "parameters": [
+            { "name": "period", "in": "path", "required": true, "schema": { "type": "string" }, "description": "Reporting period: D7, D30, D90" }
+            ],
+            "responses": { "200": { "description": "Analytics report retrieved successfully" } },
+            "x-codeSamples": [
+            {
+                "lang": "curl",
+                "source": "curl --location 'https://graph.microsoft.com/v1.0/reports/getSharePointSiteUsageDetail(period=\"D7\")' \\\n--header 'Authorization: Bearer YOUR_ACCESS_TOKEN'"
+            }
+            ]
+        }
+        },
+        "/sites/{site-id}/pages/{page-id}/microsoft.graph.sitePage": {
+        "get": {
+            "summary": "Get metadata and content of a SharePoint site page",
+            "description": "Returns the metadata for a sitePage in the site pages list of a site. Use $expand=canvasLayout to include the page content including web parts. You can also use $select to fetch only specific fields.",
+            "operationId": "getSitePageMetadata",
+            "parameters": [
+            {
+                "name": "site-id",
+                "in": "path",
+                "required": true,
+                "schema": { "type": "string" },
+                "description": "The unique identifier of the SharePoint site."
+            },
+            {
+                "name": "page-id",
+                "in": "path",
+                "required": true,
+                "schema": { "type": "string" },
+                "description": "The unique identifier of the SharePoint page."
+            },
+            {
+                "name": "$expand",
+                "in": "query",
+                "required": false,
+                "description": "Expand related entities. Use canvasLayout to include page content.",
+                "schema": { "type": "string" }
+            },
+            {
+                "name": "$select",
+                "in": "query",
+                "required": false,
+                "description": "Select specific fields to return, e.g., id,name,title",
+                "schema": { "type": "string" }
+            }
+            ],
+            "responses": {
+            "200": {
+                "description": "Site page metadata and optionally content retrieved successfully."
+            }
+            },
+            "x-codeSamples": [
+            {
+                "lang": "curl",
+                "source": "curl --location \"https://graph.microsoft.com/v1.0/sites/{site-id}/pages/{page-id}/microsoft.graph.sitePage?$expand=canvasLayout\" \\\n--header \"Authorization: Bearer YOUR_ACCESS_TOKEN\""
+            },
+            {
+                "lang": "curl",
+                "source": "curl --location \"https://graph.microsoft.com/v1.0/sites/{site-id}/pages/{page-id}/microsoft.graph.sitePage?$select=id,name\" \\\n--header \"Authorization: Bearer YOUR_ACCESS_TOKEN\""
+            }
+            ]
+        }
+        }
+    
+
+        
+    },
+    "components": {
+        "schemas": {
+            "Site": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "displayName": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Drive": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "driveType": {
+                        "type": "string"
+                    }
+                }
+            },
+            "List": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "displayName": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ListItem": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "fields": {
+                        "type": "object"
+                    }
+                }
+            },
+            "ListItemVersion": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "lastModifiedDateTime": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    }
+}
