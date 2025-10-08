@@ -1,0 +1,1159 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Table API",
+    "description": "Allows you to perform create, read, update and delete (CRUD) operations on existing tables. This specification includes a detailed schema for the 'incident' table as an example.",
+    "version": "latest"
+  },
+  "externalDocs": {
+    "url": "https://docs.servicenow.com/?context=CSHelp:REST-Table-API"
+  },
+  "servers": [
+    {
+      "url": "https://dev202281.service-now.com/"
+    }
+  ],
+  "paths": {
+    
+    "/api/now/table/{tableName}": {
+      "get": {
+        "description": "Retrieve records from a table. The response schema will vary based on the tableName.",
+        "operationId":"getTableData",
+        "parameters": [
+          {
+            "name": "tableName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "incident"
+            }
+          },
+          {
+        "name": "sysparm_query",
+        "in": "query",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "description": "An encoded query string used to filter the results. For example, `number=INC0010017` will search for an Incident by its Number field.",
+        "examples": {
+            "Number": {
+              "summary": "Find by number",
+              "value": "number=INC0010017"
+            },
+            "ShortDescription": { "summary": "Search by article title", "value": "short_descriptionLIKEVPN" },
+            "Text": {
+              "summary": "Find by text ",
+              "value": "textLIKEVPN"
+            },
+            "Version": {
+              "summary": "Find by version field",
+              "value": "version=2.0"
+            },
+            "Author": {
+              "summary": "Find by author use the tools getUsers and getCurrentUser for sys_id",
+              "value": "author=sys_id"
+            },
+            "Category": {
+              "summary": "Find by category",
+              "value": "category=Database"
+            },
+            "Workflow": {
+              "summary": "Find by workflow state",
+              "value": "workflow_state=published"
+            },
+            "Updated": {
+              "summary": "Find by last updated date",
+              "value": "sys_updated_on>=2024-09-01"
+            },
+            "KnowledgeBase": { "summary": "Search by knowledge base sys_id", "value": "kb_knowledge_base=12345abcdef" },
+             "ArticleType": { "summary": "Search by article type", "value": "article_type=html" },
+             "Active": { "summary": "Search active articles", "value": "active=true" }
+
+            
+          }
+      },{
+            "name": "sysparm_display_value",
+            "in": "query",
+            "description": "Return field display values (true), actual values (false), or both (all) (default: false)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false",
+                "all"
+              ],
+              "default": "false"
+            }
+          },
+          {
+            "name": "sysparm_exclude_reference_link",
+            "in": "query",
+            "description": "True to exclude Table API links for reference fields (default: false)",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "sysparm_suppress_pagination_header",
+            "in": "query",
+            "description": "True to supress pagination header (default: false)",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "sysparm_fields",
+            "in": "query",
+            "description": "A comma-separated list of fields to return in the response",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sysparm_limit",
+            "in": "query",
+            "description": "The maximum number of results returned per page (default: 10,000)",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "default": 10000
+            }
+          },
+          {
+            "name": "sysparm_view",
+            "in": "query",
+            "description": "Render the response according to the specified UI view (overridden by sysparm_fields)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sysparm_query_category",
+            "in": "query",
+            "description": "Name of the query category (read replica category) to use for queries",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sysparm_query_no_domain",
+            "in": "query",
+            "description": "True to access data across domains if authorized (default: false)",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "sysparm_no_count",
+            "in": "query",
+            "description": "Do not execute a select count(*) on table (default: false)",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+                  {
+            "name": "sysparm_offset",
+            "in": "query",
+            "description": "The starting row for the current page (pagination)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "example": 0
+            }
+          },
+          {
+            "name": "sysparm_first_row",
+            "in": "query",
+            "description": "The starting row (offset) for results, for pagination (default: 0)",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK. The example below shows a response from the 'incident' table.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableApiListResponse"
+                },
+                "example": {
+                  "result": [
+                    {
+                      "sys_id": "5a99085d8388b210fd669defeeaad3e0",
+                      "number": "INC0010017",
+                      "state": "1",
+                      "short_description": "Network printer is down",
+                      "caller_id": "6816f79cc0a8016401c5a33be04be441",
+                      "assignment_group": "d625dccec0a8016700a222a0f7900d06"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "curl",
+            "label": "Example Request",
+            "source": "curl --location 'https://dev326412.service-now.com/api/now/table/kb_knowledge?sysparm_query=short_descriptionLIKEvpn&sysparm_limit=10' \\\n--header 'Accept: application/json' \\\n--header 'Content-Type: application/json' \\\n--header 'Authorization: Bearer YOUR_ACCESS_TOKEN'"
+          }
+        ]
+      },
+      "post": {
+        "description": "Create a record in a table. The required fields in the body depend on the table's business rules.",
+        "operationId":"createIncidentTableRecord",
+        "parameters": [
+          {
+            "name": "tableName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "incident"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The record to create. The example below is for creating an incident.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+               "$ref": "#/components/schemas/IncidentRecord" 
+                        
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableApiSingleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+      
+    },
+    "/api/now/table/kb_knowledge": {
+     
+      "post": {
+        "description": "Create a record in a table. The required fields in the body depend on the table's business rules.",
+        "operationId":"createKnowledgeTableRecord",
+        "requestBody": {
+          "description": "The record to create. The example below is for creating an incident.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+               "$ref": "#/components/schemas/KnowledgeRecord" 
+                        
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableApiSingleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/now/table/{tableName}/{sys_id}": {
+      "get": {
+        "description": "Retrieve a single record from a table.",
+        "operationId":"retrieveTableDataBasedOnSysId",
+        "parameters": [
+          {
+            "name": "tableName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "incident"
+            }
+          },
+          {
+            "name": "sys_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableApiSingleResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Update a record with a full replacement.",
+        "operationId":"updateIncidentTableMoreAttributes",
+        "parameters": [
+          {
+            "name": "tableName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "incident"
+            }
+          },
+          {
+            "name": "sys_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IncidentRecord"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableApiSingleResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "Update a record with a partial modification.",
+        "operationId":"updateIncidentTableLessAttributes",
+        "parameters": [
+          {
+            "name": "tableName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "incident"
+            }
+          },
+          {
+            "name": "sys_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IncidentRecord"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableApiSingleResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete a record.",
+        "operationId":"deleteRecordFromTable",
+        "parameters": [
+          {
+            "name": "tableName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "incident"
+            }
+          },
+          {
+            "name": "sys_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/api/now/table/kb_knowledge/{sys_id}": {
+      
+      "put": {
+        "description": "Update a record with a full replacement.",
+        "operationId":"updateKnowledgeTableMoreAttributes",
+        "parameters": [
+          
+          {
+            "name": "sys_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IncidentRecord"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableApiSingleResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "Update a record with a partial modification.",
+        "operationId":"updateKnowledgeTableLessAttributes",
+        "parameters": [
+          
+          {
+            "name": "sys_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IncidentRecord"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TableApiSingleResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+      
+    },
+    "/api/now/table/sys_user": {
+      "get": {
+        "summary": "Get user records",
+        "operationId":"getUsers",
+        "description": "Retrieve a list of users from the sys_user table",
+        "parameters": [
+        {
+          "name": "sysparm_query",
+          "in": "query",
+          "required": true,
+          "description": "Encoded query string to filter users. Example: 'user_name=jsmith' or 'active=true'.",
+          "schema": {
+            "type": "string"
+          },
+          "examples": {
+            "ByUsername": {
+              "summary": "Find by username",
+              "value": "user_name=jsmith"
+            },
+            "ByFirstName": {
+              "summary": "Find by first name",
+              "value": "first_nameLIKEJohn"
+            },
+            "ByLastName": {
+              "summary": "Find by last name",
+              "value": "last_nameLIKEDoe"
+            },
+            "ByEmail": {
+              "summary": "Find by email containing domain",
+              "value": "emailLIKE@techolution.com"
+            },
+            "ByActiveStatus": {
+              "summary": "Find active users",
+              "value": "active=true"
+            },
+            "ByTitle": {
+              "summary": "Find by job title",
+              "value": "titleLIKEManager"
+            },
+            "ByDepartment": {
+              "summary": "Find by department",
+              "value": "departmentLIKEIT"
+            },
+            "ByManager": {
+              "summary": "Find by manager",
+              "value": "manager=John Doe"
+            },
+            "ByRoles": {
+              "summary": "Find by assigned roles",
+              "value": "roles=287ebd7b1b3c1010a1a1b2c3d4e5f6g7"
+            },
+            "ByLocation": {
+              "summary": "Find by location",
+              "value": "locationLIKEBangalore"
+            },
+            "ByCreatedDate": {
+              "summary": "Find users created after specific date",
+              "value": "sys_created_on>=2024-01-01"
+            },
+            "ByUpdatedDate": {
+              "summary": "Find users updated after specific date",
+              "value": "sys_updated_on>=2024-09-01"
+            },
+            "ByPhone": {
+              "summary": "Find by phone number",
+              "value": "phoneLIKE12345"
+            }
+          }
+        },
+        {
+          "name": "sysparm_fields",
+          "in": "query",
+          "required": false,
+          "description": "Comma-separated list of fields to return. Example: 'user_name,email,sys_id'.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sysparm_limit",
+          "in": "query",
+          "required": true,
+          "description": "Maximum number of results to return (default: 100).",
+          "schema": {
+            "type": "integer",
+            "default": 10
+          }
+        },
+        {
+          "name": "sysparm_offset",
+          "in": "query",
+          "required": false,
+          "description": "Starting row for pagination.",
+          "schema": {
+            "type": "integer",
+            "default": 0
+          }
+        },
+        {
+          "name": "sysparm_display_value",
+          "in": "query",
+          "required": false,
+          "description": "Return field display values (true), actual values (false), or both (all). Default is false.",
+          "schema": {
+            "type": "string",
+            "enum": ["true","false","all"],
+            "default": "false"
+          }
+        },
+        {
+          "name": "sysparm_exclude_reference_link",
+          "in": "query",
+          "required": false,
+          "description": "True to exclude Table API links for reference fields (default: false).",
+          "schema": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        {
+          "name": "sysparm_no_count",
+          "in": "query",
+          "required": false,
+          "description": "True to skip the select count(*) query (default: false).",
+          "schema": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              },
+              "application/xml": {},
+              "text/xml": {}
+            }
+          }
+        }
+      }
+    },
+    "/api/now/table/sys_user/{sys_id}": {
+      "get": {
+        "summary": "Get a single user record",
+        "operationId":"getSpecficUser",
+        "description": "Retrieve details of a specific user by sys_id",
+        "parameters": [
+          {
+            "name": "sys_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The sys_id of the user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "object"
+                    }
+                  }
+                }
+              },
+              "application/xml": {},
+              "text/xml": {}
+            }
+          }
+        }
+      }
+    },
+    "/api/now/ui/user/current_user": {
+      "get": {
+        "summary": "Get current user",
+        "operationId":"getCurrentUser",
+        "description": "Retrieve details of the currently logged-in user",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "properties": {
+                        "sys_id": { "type": "string" },
+                        "user_name": { "type": "string" },
+                        "first_name": { "type": "string" },
+                        "last_name": { "type": "string" },
+                        "email": { "type": "string" },
+                        "roles": { "type": "string" },
+                        "active": { "type": "boolean" }
+                      },
+                      "example": {
+                        "sys_id": "46d44a56db701010a9ad6d8a48961986",
+                        "user_name": "jdoe",
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "email": "jdoe@example.com",
+                        "roles": "admin, itil, catalog_admin",
+                        "active": true
+                      }
+                    }
+                  }
+                }
+              },
+              "application/xml": {},
+              "text/xml": {}
+            }
+          }
+        }
+      }
+    },
+    "/api/now/table/sys_user_group": {
+      "get": {
+        "summary": "Get assignment groups",
+        "operationId": "getAssignmentGroups",
+        "description": "Retrieve a list of assignment groups from the sys_user_group table",
+        "parameters": [
+          {
+            "name": "sysparm_query",
+            "in": "query",
+            "required": false,
+            "description": "Encoded query string to filter assignment groups.",
+            "schema": { "type": "string" },
+            "examples": {
+              "ByName": {
+                "summary": "Find groups by name",
+                "value": "nameLIKEIT"
+              },
+              "ByActive": {
+                "summary": "Find active groups",
+                "value": "active=true"
+              },
+              "ByManager": {
+                "summary": "Find groups managed by a specific user",
+                "value": "manager=John Doe"
+              }
+            }
+          },
+          {
+            "name": "sysparm_fields",
+            "in": "query",
+            "required": false,
+            "description": "Comma-separated list of fields to return",
+            "schema": { "type": "string" },
+            "example": "name,description,manager,active"
+          },
+          {
+            "name": "sysparm_limit",
+            "in": "query",
+            "required": false,
+            "description": "Maximum number of results returned",
+            "schema": { "type": "integer", "default": 100 }
+          },
+          {
+            "name": "sysparm_offset",
+            "in": "query",
+            "required": false,
+            "description": "Starting row for pagination",
+            "schema": { "type": "integer", "default": 0 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of assignment groups retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "array",
+                      "items": { "type": "object" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "curl",
+            "label": "List all assignment groups (limit 10)",
+            "source": "curl --location 'https://<your_instance>.service-now.com/api/now/table/sys_user_group?sysparm_limit=10' \\\n--header 'Accept: application/json' \\\n--header 'Authorization: Bearer YOUR_ACCESS_TOKEN'"
+          },
+          {
+            "lang": "curl",
+            "label": "Search assignment groups by name",
+            "source": "curl --location 'https://<your_instance>.service-now.com/api/now/table/sys_user_group?sysparm_query=nameLIKEIT&sysparm_fields=name,description&sysparm_limit=5' \\\n--header 'Accept: application/json' \\\n--header 'Authorization: Bearer YOUR_ACCESS_TOKEN'"
+          },
+          {
+            "lang": "curl",
+            "label": "Find active groups managed by a user",
+            "source": "curl --location 'https://<your_instance>.service-now.com/api/now/table/sys_user_group?sysparm_query=active=true^manager=John Doe&sysparm_fields=name,manager,active&sysparm_limit=5' \\\n--header 'Accept: application/json' \\\n--header 'Authorization: Bearer YOUR_ACCESS_TOKEN'"
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "IncidentRecord": {
+  "type": "object",
+  "description": "Schema definition for a record in the 'incident' table.",
+  "properties": {
+    "active": { "type": "boolean" },
+    "activity_due": { "type": "string", "format": "date-time" },
+    "additional_assignee_list": { "type": "string" },
+    "approval": { "type": "string" },
+    "assigned_to": { "type": "string", "description": "sys_id of the user" },
+    "assignment_group": { "type": "string", "description": "sys_id of the group" },
+    "business_duration": { "type": "string" },
+    "caller_id": { "type": "string", "description": "sys_id of the user" },
+    "category": { "type": "string" },
+    "child_incidents": { "type": "integer", "readOnly": true, "description": "Number of child incidents linked" },
+    "close_code": { "type": "string" },
+    "close_notes": { "type": "string" },
+    "closed_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "closed_by": { "type": "string", "readOnly": true },
+    "cmdb_ci": { "type": "string", "description": "sys_id of the configuration item" },
+    "comments": { "type": "string" },
+    "comments_and_work_notes": { "type": "string" },
+    "company": { "type": "string", "description": "sys_id of the company" },
+    "contact_type": { "type": "string" },
+    "description": { "type": "string" },
+    "due_date": { "type": "string", "format": "date-time" },
+    "escalation": { "type": "integer" },
+    "expected_start": { "type": "string", "format": "date-time" },
+    "impact": { "type": "integer" },
+    "incident_state": { "type": "integer" },
+    "knowledge": { "type": "boolean" },
+    "location": { "type": "string", "description": "sys_id of the location" },
+    "made_sla": { "type": "boolean" },
+    "notify": { "type": "integer" },
+    "number": { "type": "string", "readOnly": true },
+    "opened_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "opened_by": { "type": "string", "readOnly": true },
+    "parent": { "type": "string", "description": "sys_id of the parent task/record" },
+    "parent_incident": { "type": "string", "description": "sys_id of the parent incident (if applicable)" },
+    "priority": { "type": "integer" },
+    "problem_id": { "type": "string" },
+    "reassignment_count": { "type": "integer", "readOnly": true },
+    "resolved_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "resolved_by": { "type": "string", "readOnly": true },
+    "rfc": { "type": "string" },
+    "severity": { "type": "integer" },
+    "short_description": { "type": "string" },
+    "watch_list": { "type": "string" },
+    "sla_due": { "type": "string", "format": "date-time" },
+    "state": {
+      "type": "integer",
+      "description": "The display value of the record's current state. (Note: ServiceNow API often returns numeric values instead).Indicates the current status of the incident, where 1 = New, 2 = In Progress, 3 = On Hold, 4 = Resolved, 5 = Closed, and 6 = Cancelled."
+      
+    },
+    "hold_reason": {
+      "type": "string",
+      "description": "Reason a record is on hold (if state = On Hold).",
+      "enum": ["Awaiting Caller", "Awaiting Change", "Awaiting Problem", "Awaiting Vendor"]
+    },
+    "subcategory": { "type": "string" },
+    "sys_class_name": { "type": "string" },
+    "sys_created_by": { "type": "string", "readOnly": true },
+    "sys_created_on": { "type": "string", "format": "date-time", "readOnly": true },
+    "sys_domain": { "type": "string" },
+    "sys_id": { "type": "string", "format": "uuid", "readOnly": true },
+    "sys_mod_count": { "type": "integer", "readOnly": true },
+    "sys_updated_by": { "type": "string", "readOnly": true },
+    "sys_updated_on": { "type": "string", "format": "date-time", "readOnly": true },
+    "urgency": { "type": "integer" },
+    "work_notes": { "type": "string" }
+  },
+  "example": {
+    "caller_id": "6816f79cc0a8016401c5a33be04be441",
+    "short_description": "Email server is slow",
+    "category": "software",
+    "impact": 2,
+    "urgency": 2,
+    "priority": 3,
+    "made_sla": true,
+    "active": true
+  }
+       },
+
+      "KnowledgeRecord": {
+    "type": "object",
+    "description": "Schema definition for a record in the 'kb_knowledge' table.",
+    "properties": {
+      "active": { "type": "boolean" },
+      "article_type": { "type": "string", "enum": [ "html"],"description": "convert the user given text to html format " },
+      "author": { "type": "string", "description": "sys_id of the authoring user" },
+      "disable_commenting": { "type": "boolean" },
+      "disable_suggesting": { "type": "boolean" },
+      "display_attachments": { "type": "boolean" },
+      "flagged": { "type": "boolean" },
+      "kb_category": { "type": "string", "description": "sys_id of the knowledge category" },
+      "kb_knowledge_base": { "type": "string", "description": "sys_id of the knowledge base" },
+      "meta": { "type": "string" },
+      "meta_description": { "type": "string" },
+      "ownership_group": { "type": "string", "description": "sys_id of the ownership group" },
+      "published": { "type": "string", "format": "date-time", "readOnly": true },
+      "rating": { "type": "number", "readOnly": true },
+      "roles": { "type": "string", "description": "Comma-separated list of roles that can view" },
+      "scheduled_publish_date": { "type": "string", "format": "date-time" },
+      "short_description": { "type": "string" },
+      "text": { "type": "string", "description": "The main body of the article (HTML content)" },
+      "valid_to": { "type": "string", "format": "date" },
+      "workflow_state": {
+          "type": "string",
+          "description": "The current lifecycle state of the knowledge article.",
+          "readOnly": true,
+          "enum": [
+            "draft",
+            "review",
+            "published",
+            "pending_retirement",
+            "retired",
+            "outdated"
+          ]
+        },
+      "number": { "type": "string", "readOnly": true },
+      "sys_id": { "type": "string", "format": "uuid", "readOnly": true },
+      "sys_view_count": { "type": "integer", "readOnly": true }
+    },
+    "example":{
+  "short_description": "How to Connect to the Office VPN on Windows",
+  "author": "6816f79cc0a8016401c5a33be04be441",
+  "article_type": "html",
+  "active": true,
+  "valid_to": "2027-12-31",
+  "text": "<h1>Connecting to the VPN</h1><p>Follow these steps to connect to the corporate Virtual Private Network (VPN) from your Windows device.</p><strong>Prerequisites:</strong><ul><li>You must have the GlobalProtect VPN client installed.</li><li>You must have your multi-factor authentication (MFA) device ready.</li></ul><p>Please contact the IT Help Desk if you need assistance with the client installation.</p>"
+}
+       }, 
+      "ServiceRequestRecord": {
+    "type": "object",
+    "description": "Schema definition for a record in the 'sc_request' (Service Request) table.",
+    "properties": {
+      "active": {
+        "type": "boolean"
+      },
+      "approval": {
+        "type": "string",
+        "enum": ["approved", "rejected", "requested"]
+      },
+      "assigned_to": {
+        "type": "string",
+        "description": "sys_id of the assigned user."
+      },
+      "assignment_group": {
+        "type": "string",
+        "description": "sys_id of the assignment group."
+      },
+      "close_notes": {
+        "type": "string"
+      },
+      "closed_at": {
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true
+      },
+      "comments": {
+        "type": "string"
+      },
+      "company": {
+        "type": "string",
+        "description": "sys_id of the company."
+      },
+      "description": {
+        "type": "string"
+      },
+      "due_date": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "escalation": {
+        "type": "integer"
+      },
+      "expected_start": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "impact": {
+        "type": "integer"
+      },
+      "knowledge": {
+        "type": "boolean"
+      },
+      "location": {
+        "type": "string",
+        "description": "sys_id of the location."
+      },
+      "made_sla": {
+        "type": "boolean"
+      },
+      "number": {
+        "type": "string",
+        "readOnly": true
+      },
+      "opened_at": {
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true
+      },
+      "opened_by": {
+        "type": "string",
+        "description": "sys_id of the user who opened the request.",
+        "readOnly": true
+      },
+      "price": {
+        "type": "number",
+        "format": "double"
+      },
+      "priority": {
+        "type": "integer"
+      },
+      "reassignment_count": {
+        "type": "integer",
+        "readOnly": true
+      },
+      "request_state": {
+        "type": "string"
+      },
+      "requested_for": {
+        "type": "string",
+        "description": "sys_id of the user the request is for."
+      },
+      "short_description": {
+        "type": "string"
+      },
+      "special_instructions": {
+        "type": "string"
+      },
+      "stage": {
+        "type": "string"
+      },
+      "state": {
+        "type": "integer"
+      },
+      "sys_created_on": {
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true
+      },
+      "sys_id": {
+        "type": "string",
+        "format": "uuid",
+        "readOnly": true
+      },
+      "sys_updated_on": {
+        "type": "string",
+        "format": "date-time",
+        "readOnly": true
+      },
+      "urgency": {
+        "type": "integer"
+      },
+      "watch_list": {
+        "type": "string",
+        "description": "Comma-separated list of user sys_ids."
+      },
+      "work_notes": {
+        "type": "string"
+      }
+    },
+    "example": {
+      "requested_for": "6816f79cc0a8016401c5a33be04be441",
+      "short_description": "New Laptop Request for Alice Johnson",
+      "description": "Requesting a standard developer laptop (Model X-15) for a new hire, Alice Johnson.",
+      "urgency": 2,
+      "impact": 2,
+      "price": 1800.00
+    }
+      },
+      "TableApiSingleResponse": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "The resulting record. The specific fields depend on the table queried. The example shows an Incident record.",
+            "example": {
+              "sys_id": "5a99085d8388b210fd669defeeaad3e0",
+              "number": "INC0010017",
+              "short_description": "Email server is slow"
+            }
+          }
+        }
+      },
+      "TableApiListResponse": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        }
+      }
+      
+    }
+  }
+}
