@@ -1232,44 +1232,74 @@
         }
         },
         "/search/query": {
-        "post": {
-            "summary": "Search SharePoint content for high-interest topics",
-            "description": "Execute a search query across SharePoint sites, drives, and lists. Aggregates search terms to identify frequently searched content and high-interest topics.",
-            "operationId": "searchSharePointContent",
-            "requestBody": {
-            "required": true,
-            "content": {
-                "application/json": {
-                "schema": {
+         "post": {
+  "summary": "Search SharePoint content across pages, news, drives, and lists",
+  "description": "Execute a search query across SharePoint sites, pages, news, drives, and lists. Searches title, description, and file content, aggregating high-interest topics.",
+  "operationId": "searchSharePointContent",
+  "tags": ["Search"],
+  "requestBody": {
+    "required": true,
+    "content": {
+      "application/json": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "requests": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "entityTypes": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "example": ["site", "listItem", "driveItem", "sitePage"]
+                  },
+                  "query": {
                     "type": "object",
                     "properties": {
-                    "requests": {
-                        "type": "array",
-                        "items": {
-                        "type": "object",
-                        "properties": {
-                            "entityTypes": { "type": "array", "items": { "type": "string" } },
-                            "query": { "type": "object", "properties": { "queryString": { "type": "string" } } },
-                            "aggregationFilters": { "type": "array", "items": { "type": "string" } },
-                            "from": { "type": "integer" },
-                            "size": { "type": "integer" }
-                        },
-                        "required": ["entityTypes", "query"]
-                        }
-                    }
-                    }
-                }
-                }
+                      "queryString": {
+                        "type": "string",
+                        "example": "Project Plan"
+                      }
+                    },
+                    "required": ["queryString"]
+                  },
+                  "aggregationFilters": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "example": []
+                  },
+                  "from": {
+                    "type": "integer",
+                    "example": 0
+                  },
+                  "size": {
+                    "type": "integer",
+                    "example": 20
+                  }
+                },
+                "required": ["entityTypes", "query"]
+              }
             }
-            },
-            "responses": { "200": { "description": "Search results with aggregated high-interest topics" } },
-            "x-codeSamples": [
-            {
-                "lang": "curl",
-                "source": "curl --location 'https://graph.microsoft.com/v1.0/search/query' \\\n--header 'Authorization: Bearer YOUR_ACCESS_TOKEN' \\\n--header 'Content-Type: application/json' \\\n--data-raw '{\"requests\":[{\"entityTypes\":[\"site\",\"listItem\",\"driveItem\"],\"query\":{\"queryString\":\"*\"},\"aggregationFilters\":[\"searchTerms\"],\"from\":0,\"size\":50}]}'"
-            }
-            ]
+          }
         }
+      }
+    }
+  },
+  "responses": {
+    "200": {
+      "description": "Search results matching the query"
+    }
+  },
+  "x-codeSamples": [
+    {
+      "lang": "curl",
+      "source": "curl --location --request POST 'https://graph.microsoft.com/v1.0/search/query' --header 'Authorization: Bearer YOUR_ACCESS_TOKEN' --header 'Content-Type: application/json' --data-raw '{\"requests\":[{\"entityTypes\":[\"site\",\"listItem\",\"driveItem\",\"sitePage\"],\"query\":{\"queryString\":\"Project Plan\"},\"aggregationFilters\":[],\"from\":0,\"size\":20}]}'"
+    }
+  ]
+         }
+
+
         },
         "/reports/getSharePointSiteUsageDetail(period='{period}')": {
         "get": {
